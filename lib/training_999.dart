@@ -1,14 +1,28 @@
+import 'dart:math';
+
+import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
+import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:training999/components/airplane.dart';
+import 'package:training999/components/bullet.dart';
+import 'package:training999/components/debug_circle.dart';
+import 'package:training999/components/space.dart';
 
 class Training999 extends FlameGame
     with DragCallbacks, HasKeyboardHandlerComponents {
-  late Airplane _player;
+  late Airplane player;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
+  final Random _rng = Random();
+  late double gameSizeOfRadius;
+
+  Training999()
+      : super(
+            camera: CameraComponent(
+                viewport: FixedAspectRatioViewport(aspectRatio: 1 / 1)),
+            world: Space());
 
   @override
   Color backgroundColor() => const Color(0xFF211F30);
@@ -16,8 +30,25 @@ class Training999 extends FlameGame
   @override
   Future onLoad() async {
     await images.loadAllImages();
-    add(_player = Airplane());
+    gameSizeOfRadius = pow(
+            pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
+            0.5) /
+        4.0;
+
+    add(player = Airplane());
+    add(DebugCircle(gameSizeOfRadius));
     addJoystick();
+    addBullet();
+  }
+
+  void addBullet() {
+    var random1 = Vector2.random(_rng);
+    var random2 = Vector2.random(_rng);
+    final velocity = (random1 - random2) * 80;
+
+    for (var i = 0; i <= 10; i++) {
+      add(Bullet(velocity, 0 + (360 / 10) * i));
+    }
   }
 
   @override
@@ -28,99 +59,96 @@ class Training999 extends FlameGame
 
   void addJoystick() {
     joystickLeft = JoystickComponent(
-      priority: 10,
-      knob: SpriteComponent(
-        sprite: Sprite(
-          images.fromCache('Knob.png'),
+        priority: 10,
+        knob: SpriteComponent(
+          sprite: Sprite(
+            images.fromCache('Knob.png'),
+          ),
         ),
-      ),
-      background: SpriteComponent(
-        sprite: Sprite(
-          images.fromCache('Joystick.png'),
+        background: SpriteComponent(
+          sprite: Sprite(
+            images.fromCache('Joystick.png'),
+          ),
         ),
-      ),
-      margin: const EdgeInsets.only(left: 32, bottom: 32),
-    );
+        position: Vector2(64, canvasSize.y - 64));
     add(joystickLeft);
 
     joystickRight = JoystickComponent(
-      priority: 10,
-      knob: SpriteComponent(
-        sprite: Sprite(
-          images.fromCache('Knob.png'),
+        priority: 10,
+        knob: SpriteComponent(
+          sprite: Sprite(
+            images.fromCache('Knob.png'),
+          ),
         ),
-      ),
-      background: SpriteComponent(
-        sprite: Sprite(
-          images.fromCache('Joystick.png'),
+        background: SpriteComponent(
+          sprite: Sprite(
+            images.fromCache('Joystick.png'),
+          ),
         ),
-      ),
-      margin: const EdgeInsets.only(right: 32, bottom: 32),
-    );
+        position: Vector2(canvasSize.x - 64, canvasSize.y - 64));
     add(joystickRight);
   }
 
   void updateJoystick() {
     switch (joystickLeft.direction) {
       case JoystickDirection.left:
-        _player.position += Vector2(-1, 0);
+        player.position += Vector2(-1, 0);
         break;
       case JoystickDirection.upLeft:
-        _player.position += Vector2(-0.75, -0.75);
+        player.position += Vector2(-0.75, -0.75);
         break;
       case JoystickDirection.up:
-        _player.position += Vector2(0, -1);
+        player.position += Vector2(0, -1);
         break;
       case JoystickDirection.upRight:
-        _player.position += Vector2(0.75, -0.75);
+        player.position += Vector2(0.75, -0.75);
         break;
       case JoystickDirection.right:
-        _player.position += Vector2(1, 0);
+        player.position += Vector2(1, 0);
         break;
       case JoystickDirection.downRight:
-        _player.position += Vector2(0.75, 0.75);
+        player.position += Vector2(0.75, 0.75);
         break;
       case JoystickDirection.down:
-        _player.position += Vector2(0, 1);
+        player.position += Vector2(0, 1);
         break;
       case JoystickDirection.downLeft:
-        _player.position += Vector2(-0.75, 0.75);
+        player.position += Vector2(-0.75, 0.75);
         break;
       default:
-        _player.position += Vector2(0, 0);
+        player.position += Vector2(0, 0);
         break;
     }
 
     switch (joystickRight.direction) {
       case JoystickDirection.left:
-        _player.position += Vector2(-1, 0);
+        player.position += Vector2(-1, 0);
         break;
       case JoystickDirection.upLeft:
-        _player.position += Vector2(-0.75, -0.75);
+        player.position += Vector2(-0.75, -0.75);
         break;
       case JoystickDirection.up:
-        _player.position += Vector2(0, -1);
+        player.position += Vector2(0, -1);
         break;
       case JoystickDirection.upRight:
-        _player.position += Vector2(0.75, -0.75);
+        player.position += Vector2(0.75, -0.75);
         break;
       case JoystickDirection.right:
-        _player.position += Vector2(1, 0);
+        player.position += Vector2(1, 0);
         break;
       case JoystickDirection.downRight:
-        _player.position += Vector2(0.75, 0.75);
+        player.position += Vector2(0.75, 0.75);
         break;
       case JoystickDirection.down:
-        _player.position += Vector2(0, 1);
+        player.position += Vector2(0, 1);
         break;
       case JoystickDirection.downLeft:
-        _player.position += Vector2(-0.75, 0.75);
+        player.position += Vector2(-0.75, 0.75);
         break;
       default:
-        _player.position += Vector2(0, 0);
+        player.position += Vector2(0, 0);
         break;
     }
-    _player.position +=
-        joystickLeft.relativeDelta + joystickRight.relativeDelta;
+    player.position += joystickLeft.relativeDelta + joystickRight.relativeDelta;
   }
 }

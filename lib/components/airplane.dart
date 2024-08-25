@@ -1,13 +1,17 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flutter/cupertino.dart';
+
+import 'bullet.dart';
 
 class Airplane extends SpriteAnimationComponent
     with HasGameRef, CollisionCallbacks {
-  Airplane() : super(size: Vector2(32, 39), anchor: Anchor.center);
+  Airplane() : super(size: Vector2(16, 19.5), anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
-    position = game.size / 2;
+    position = game.canvasSize / 2;
+    debugMode = true;
     animation = await game.loadSpriteAnimation(
       'airplane.png',
       SpriteAnimationData.sequenced(
@@ -16,6 +20,7 @@ class Airplane extends SpriteAnimationComponent
         textureSize: Vector2(32, 39),
       ),
     );
+    add(RectangleHitbox());
   }
 
   @override
@@ -24,5 +29,8 @@ class Airplane extends SpriteAnimationComponent
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
+    if (other is Bullet) {
+      debugPrint('[TONY] Airplane collided with bullet!');
+    }
   }
 }
