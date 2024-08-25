@@ -3,7 +3,7 @@ import 'package:flame/components.dart';
 
 class Airplane extends SpriteAnimationComponent
     with HasGameRef, CollisionCallbacks {
-  Airplane() : super(size: Vector2(50, 75), anchor: Anchor.center);
+  Airplane() : super(size: Vector2(32, 39), anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
