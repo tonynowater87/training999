@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/training_999.dart';
@@ -11,6 +10,8 @@ class Bullet extends RectangleComponent
     with HasGameRef<Training999>, CollisionCallbacks {
   Vector2 _velocity;
   double _randomAngle;
+  TextPaint textPaint =
+      TextPaint(style: TextStyle(color: Colors.white, fontSize: 8));
 
   Bullet(this._velocity, this._randomAngle) : super() {
     size = Vector2.all(10);
@@ -23,25 +24,23 @@ class Bullet extends RectangleComponent
     //debugPrint('[TONY] Bullet position: $position');
 
     add(RectangleHitbox());
-    add(TextBoxComponent(
-        text: '$_randomAngle',
-        boxConfig: TextBoxConfig(),
-        size: Vector2(50, 50)));
+    add(TextBoxComponent(textRenderer: textPaint, text: '$_randomAngle'));
 
     position = Vector2(game.gameSizeOfRadius * cos(_randomAngle),
             game.gameSizeOfRadius * sin(_randomAngle))
         .translated(game.canvasSize.x / 2, game.canvasSize.y / 2);
-    debugPrint(
-        '[TONY] game size of radius: ${game.gameSizeOfRadius}, size: ${game.canvasSize}');
-    debugPrint('[TONY] Bullet position: $position');
+    // debugPrint(
+    //     '[TONY] game size of radius: ${game.gameSizeOfRadius}, canvasSize: ${game.canvasSize}, gameSize: ${game.size}');
     var endPosition = Vector2(-position.x, -position.y);
-    add(MoveToEffect(
-      endPosition,
-      EffectController(
-        duration: 10,
-        curve: Curves.linear,
-      ),
-    ));
+    debugPrint(
+        '[TONY] $_randomAngle, Bullet position: $position, endPosition: $endPosition');
+    // add(MoveToEffect(
+    //   endPosition,
+    //   EffectController(
+    //     duration: 10,
+    //     curve: Curves.linear,
+    //   ),
+    // ));
   }
 
   @override
