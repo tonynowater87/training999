@@ -2,45 +2,49 @@ import 'dart:math';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flutter/material.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/training_999.dart';
 
-class Bullet extends RectangleComponent
+class Bullet extends CircleComponent
     with HasGameRef<Training999>, CollisionCallbacks {
   Vector2 _velocity;
-  double _randomAngle;
+  double _randomRadians;
+  String title;
   TextPaint textPaint =
-      TextPaint(style: TextStyle(color: Colors.white, fontSize: 8));
+      TextPaint(style: const TextStyle(color: Colors.white, fontSize: 8));
 
-  Bullet(this._velocity, this._randomAngle) : super() {
-    size = Vector2.all(10);
-    paint = Paint()..color = Colors.red;
-  }
+  Bullet(this._velocity, this._randomRadians, this.title)
+      : super(radius: 5, paint: Paint()..color = Colors.red);
 
   @override
   Future<void> onLoad() async {
-    //position = Vector2(game.camera.viewport.position.x, game.camera.viewport.position.y);
-    //debugPrint('[TONY] Bullet position: $position');
+    super.onLoad();
 
+    anchor = Anchor.center;
     add(RectangleHitbox());
-    add(TextBoxComponent(textRenderer: textPaint, text: '$_randomAngle'));
+    add(TextBoxComponent(textRenderer: textPaint, text: '$title'));
 
-    position = Vector2(game.gameSizeOfRadius * cos(_randomAngle),
-            game.gameSizeOfRadius * sin(_randomAngle))
+    var initX = game.gameSizeOfRadius * cos(_randomRadians);
+    var initY = game.gameSizeOfRadius * sin(_randomRadians);
+
+    position = Vector2(initX, initY)
         .translated(game.canvasSize.x / 2, game.canvasSize.y / 2);
-    // debugPrint(
-    //     '[TONY] game size of radius: ${game.gameSizeOfRadius}, canvasSize: ${game.canvasSize}, gameSize: ${game.size}');
-    var endPosition = Vector2(-position.x, -position.y);
-    debugPrint(
-        '[TONY] $_randomAngle, Bullet position: $position, endPosition: $endPosition');
-    // add(MoveToEffect(
-    //   endPosition,
-    //   EffectController(
-    //     duration: 10,
-    //     curve: Curves.linear,
-    //   ),
-    // ));
+
+    var endX = game.gameSizeOfRadius * cos(_randomRadians + pi);
+    var endY = game.gameSizeOfRadius * sin(_randomRadians + pi);
+
+    var endPosition = Vector2(endX, endY)
+        .translated(game.canvasSize.x / 2, game.canvasSize.y / 2);
+    add(MoveToEffect(
+        endPosition,
+        EffectController(
+          duration: 10,
+          curve: Curves.linear,
+        ), onComplete: () {
+      removeFromParent();
+    }));
   }
 
   @override

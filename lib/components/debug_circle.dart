@@ -13,6 +13,6 @@ class DebugCircle extends CircleComponent with HasGameRef<Training999> {
 
   @override
   void onMount() {
-    position = game.canvasSize / 2;
+    position = position.translated(game.canvasSize.x / 2, game.canvasSize.y / 2);
   }
 }

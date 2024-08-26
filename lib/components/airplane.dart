@@ -11,7 +11,6 @@ class Airplane extends SpriteAnimationComponent
   @override
   Future<void> onLoad() async {
     position = game.canvasSize / 2;
-    debugMode = true;
     animation = await game.loadSpriteAnimation(
       'airplane.png',
       SpriteAnimationData.sequenced(

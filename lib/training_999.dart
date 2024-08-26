@@ -46,8 +46,8 @@ class Training999 extends FlameGame
     var random2 = Vector2.random(_rng);
     final velocity = (random1 - random2) * 80;
 
-    for (var i = 0; i <= 12; i++) {
-      add(Bullet(velocity, 0 + (360 / 12) * i));
+    for (var i = 0; i <= 10; i++) {
+      add(Bullet(velocity, 0 + ((360 / 11) * i * pi) / 180, 'Bullet $i'));
     }
   }
 
