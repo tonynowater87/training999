@@ -8,7 +8,6 @@ import 'package:flame/game.dart';
 import 'package:flutter/foundation.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
-import 'package:training999/components/space.dart';
 
 class Training999 extends FlameGame
     with DragCallbacks, HasKeyboardHandlerComponents {
@@ -18,11 +17,7 @@ class Training999 extends FlameGame
   final Random _rng = Random();
   late double gameSizeOfRadius;
 
-  Training999()
-      : super(
-            camera: CameraComponent(
-                viewport: FixedAspectRatioViewport(aspectRatio: 1 / 1)),
-            world: Space());
+  Training999() : super();
 
   @override
   Color backgroundColor() => const Color(0xFF211F30);
@@ -46,7 +41,8 @@ class Training999 extends FlameGame
     debugPrint('[TONY] game.size: $size');
     debugPrint('[TONY] game.canvasSize: $canvasSize');
     debugPrint('[TONY] camera.viewport.size: ${camera.viewport.size}');
-    debugPrint('[TONY] camera.viewfinder.camera.viewport.size: ${camera.viewfinder.camera.viewport.size}');
+    debugPrint(
+        '[TONY] camera.viewfinder.camera.viewport.size: ${camera.viewfinder.camera.viewport.size}');
 
     add(player = Airplane());
     addJoystick();
@@ -66,7 +62,8 @@ class Training999 extends FlameGame
             var randomRadians = _rng.nextDouble() * 360 * pi / 180;
             add(Bullet(velocity, randomRadians, 'Bullet $i'));
           }
-        })..onTick());
+        })
+      ..onTick());
   }
 
   @override

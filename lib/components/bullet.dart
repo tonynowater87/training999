@@ -61,12 +61,12 @@ class Bullet extends CircleComponent
     final direction = Vector2(1, 0);
     position += direction + _velocity * dt;
 
-    if (position.y < 0 ||
-        position.y > game.size.y ||
-        position.x > game.size.x ||
-        position.x + size.x < 0) {
-      removeFromParent();
-    }
+    // if (position.y < 0 ||
+    //     position.y > game.size.y ||
+    //     position.x > game.size.x ||
+    //     position.x + size.x < 0) {
+    //   removeFromParent();
+    // }
 
     // var distanceTo = position.distanceTo(endPoint);
     // if (distanceTo < 5) {
