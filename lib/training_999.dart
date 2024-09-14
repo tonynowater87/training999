@@ -5,9 +5,9 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/foundation.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
-import 'package:training999/components/debug_circle.dart';
 import 'package:training999/components/space.dart';
 
 class Training999 extends FlameGame
@@ -28,27 +28,45 @@ class Training999 extends FlameGame
   Color backgroundColor() => const Color(0xFF211F30);
 
   @override
+  void stepEngine({double stepTime = 1 / 60}) {
+    debugPrint('[TONY] stepEngine: $stepTime');
+    super.stepEngine();
+  }
+
+  @override
   Future onLoad() async {
+    debugMode = kDebugMode;
     await images.loadAllImages();
     gameSizeOfRadius = pow(
             pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
             0.5) /
-        4.0;
+        2.0;
+
+    debugPrint('[TONY] gameSizeOfRadius: $gameSizeOfRadius');
+    debugPrint('[TONY] game.size: $size');
+    debugPrint('[TONY] game.canvasSize: $canvasSize');
+    debugPrint('[TONY] camera.viewport.size: ${camera.viewport.size}');
+    debugPrint('[TONY] camera.viewfinder.camera.viewport.size: ${camera.viewfinder.camera.viewport.size}');
 
     add(player = Airplane());
-    add(DebugCircle(gameSizeOfRadius));
     addJoystick();
     addBullet();
   }
 
   void addBullet() {
-    var random1 = Vector2.random(_rng);
-    var random2 = Vector2.random(_rng);
-    final velocity = (random1 - random2) * 80;
+    var random = Vector2.random(_rng);
+    final velocity = random * 10 + Vector2(50, 0);
 
-    for (var i = 0; i <= 10; i++) {
-      add(Bullet(velocity, 0 + ((360 / 11) * i * pi) / 180, 'Bullet $i'));
-    }
+    add(TimerComponent(
+        period: 5,
+        repeat: true,
+        autoStart: true,
+        onTick: () {
+          for (var i = 1; i <= 1; i++) {
+            var randomRadians = _rng.nextDouble() * 360 * pi / 180;
+            add(Bullet(velocity, randomRadians, 'Bullet $i'));
+          }
+        })..onTick());
   }
 
   @override
@@ -92,25 +110,25 @@ class Training999 extends FlameGame
   void updateJoystick() {
     switch (joystickLeft.direction) {
       case JoystickDirection.left:
-        player.position += Vector2(-1, 0);
+        player.position += Vector2(-0.75, 0);
         break;
       case JoystickDirection.upLeft:
         player.position += Vector2(-0.75, -0.75);
         break;
       case JoystickDirection.up:
-        player.position += Vector2(0, -1);
+        player.position += Vector2(0, -0.75);
         break;
       case JoystickDirection.upRight:
         player.position += Vector2(0.75, -0.75);
         break;
       case JoystickDirection.right:
-        player.position += Vector2(1, 0);
+        player.position += Vector2(0.75, 0);
         break;
       case JoystickDirection.downRight:
         player.position += Vector2(0.75, 0.75);
         break;
       case JoystickDirection.down:
-        player.position += Vector2(0, 1);
+        player.position += Vector2(0, 0.75);
         break;
       case JoystickDirection.downLeft:
         player.position += Vector2(-0.75, 0.75);
@@ -122,25 +140,25 @@ class Training999 extends FlameGame
 
     switch (joystickRight.direction) {
       case JoystickDirection.left:
-        player.position += Vector2(-1, 0);
+        player.position += Vector2(-0.75, 0);
         break;
       case JoystickDirection.upLeft:
         player.position += Vector2(-0.75, -0.75);
         break;
       case JoystickDirection.up:
-        player.position += Vector2(0, -1);
+        player.position += Vector2(0, -0.75);
         break;
       case JoystickDirection.upRight:
         player.position += Vector2(0.75, -0.75);
         break;
       case JoystickDirection.right:
-        player.position += Vector2(1, 0);
+        player.position += Vector2(0.75, 0);
         break;
       case JoystickDirection.downRight:
         player.position += Vector2(0.75, 0.75);
         break;
       case JoystickDirection.down:
-        player.position += Vector2(0, 1);
+        player.position += Vector2(0, 0.75);
         break;
       case JoystickDirection.downLeft:
         player.position += Vector2(-0.75, 0.75);

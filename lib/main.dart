@@ -10,5 +10,9 @@ Future<void> main() async {
   await Flame.device.setLandscape();
 
   var game = Training999();
-  runApp(GameWidget(game: kDebugMode ? Training999() : game));
+  runApp(GameWidget.controlled(
+    gameFactory: () {
+      return kDebugMode ? Training999() : game;
+    },
+  ));
 }
