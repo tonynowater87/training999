@@ -7,15 +7,14 @@ import 'package:training999/training_999.dart';
 
 class Bullet extends CircleComponent
     with HasGameRef<Training999>, CollisionCallbacks {
-  Vector2 _velocity;
+  late Vector2 _velocity;
   double _randomRadians;
   String title;
-  TextPaint textPaint =
-      TextPaint(style: const TextStyle(color: Colors.white, fontSize: 8));
+  late Vector2 direction;
 
   late Vector2 endPoint;
 
-  Bullet(this._velocity, this._randomRadians, this.title)
+  Bullet(this._randomRadians, this.title)
       : super(
             radius: 2,
             paint: Paint()..color = Colors.yellow,
@@ -30,27 +29,39 @@ class Bullet extends CircleComponent
   @override
   void onMount() {
     position = position.translated(game.canvasSize.x / 2, game.canvasSize.y / 2);
+    var centerX = game.canvasSize.x / 2;
+    var centerY = game.canvasSize.y / 2;
+    debugPrint('[TONY] $hashCode Bullet onMount $position ($centerX, $centerY)');
     super.onMount();
   }
 
   @override
   void onRemove() {
-    debugPrint('[TONY] $hashCode Bullet onRemove: $size');
+    debugPrint('[TONY] $hashCode Bullet onRemove');
     super.onRemove();
   }
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-    debugPrint('[TONY] $hashCode Bullet onLoad: $size');
+
+    var random = Vector2.random();
 
     add(CircleHitbox());
-    //add(TextBoxComponent(textRenderer: textPaint, text: '$title'));
 
     var initX = game.gameSizeOfRadius * cos(_randomRadians);
     var initY = game.gameSizeOfRadius * sin(_randomRadians);
 
+    var centerX = game.canvasSize.x / 2;
+    var centerY = game.canvasSize.y / 2;
+
+    direction = Vector2(centerX > initX ? 1 : -1, centerY > initY ? 1 : -1);
+
     position = positionOf(Vector2(initX, initY));
+
+    _velocity = random * 100 + Vector2(direction.x, direction.y);
+
+    debugPrint('[TONY] $hashCode Bullet onLoad: $direction, $_randomRadians');
   }
 
   double bufferSize = 35;
@@ -58,19 +69,13 @@ class Bullet extends CircleComponent
   @override
   void update(double dt) {
     super.update(dt);
-    final direction = Vector2(1, 0);
     position += direction + _velocity * dt;
 
-    // if (position.y < 0 ||
-    //     position.y > game.size.y ||
-    //     position.x > game.size.x ||
-    //     position.x + size.x < 0) {
-    //   removeFromParent();
-    // }
-
-    // var distanceTo = position.distanceTo(endPoint);
-    // if (distanceTo < 5) {
-    //   removeFromParent();
-    // }
+    if (position.y < -game.gameSizeOfRadius / 2 ||
+        position.y > game.size.y + game.gameSizeOfRadius / 2 ||
+        position.x > game.size.x + game.gameSizeOfRadius / 2 ||
+        position.x + size.x < -game.gameSizeOfRadius / 2) {
+      removeFromParent();
+    }
   }
 }

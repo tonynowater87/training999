@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:flame/camera.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
@@ -30,7 +29,7 @@ class Training999 extends FlameGame
 
   @override
   Future onLoad() async {
-    debugMode = kDebugMode;
+    // debugMode = kDebugMode;
     await images.loadAllImages();
     gameSizeOfRadius = pow(
             pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
@@ -50,17 +49,14 @@ class Training999 extends FlameGame
   }
 
   void addBullet() {
-    var random = Vector2.random(_rng);
-    final velocity = random * 10 + Vector2(50, 0);
-
     add(TimerComponent(
-        period: 5,
+        period: 0.1,
         repeat: true,
         autoStart: true,
         onTick: () {
           for (var i = 1; i <= 1; i++) {
             var randomRadians = _rng.nextDouble() * 360 * pi / 180;
-            add(Bullet(velocity, randomRadians, 'Bullet $i'));
+            add(Bullet(randomRadians, 'Bullet $i'));
           }
         })
       ..onTick());
