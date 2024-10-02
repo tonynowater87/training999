@@ -4,12 +4,11 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 
-class Training999 extends FlameGame
-    with DragCallbacks, HasKeyboardHandlerComponents {
+class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerComponents {
   late Airplane player;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
@@ -31,17 +30,12 @@ class Training999 extends FlameGame
   Future onLoad() async {
     // debugMode = kDebugMode;
     await images.loadAllImages();
-    gameSizeOfRadius = pow(
-            pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
-            0.5) /
-        2.0;
-
+    gameSizeOfRadius = pow(pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2), 0.5) / 2.0;
     debugPrint('[TONY] gameSizeOfRadius: $gameSizeOfRadius');
     debugPrint('[TONY] game.size: $size');
     debugPrint('[TONY] game.canvasSize: $canvasSize');
     debugPrint('[TONY] camera.viewport.size: ${camera.viewport.size}');
-    debugPrint(
-        '[TONY] camera.viewfinder.camera.viewport.size: ${camera.viewfinder.camera.viewport.size}');
+    debugPrint('[TONY] camera.viewfinder.camera.viewport.size: ${camera.viewfinder.camera.viewport.size}');
 
     add(player = Airplane());
     addJoystick();
@@ -55,8 +49,10 @@ class Training999 extends FlameGame
         autoStart: true,
         onTick: () {
           for (var i = 1; i <= 1; i++) {
-            var randomRadians = _rng.nextDouble() * 360 * pi / 180;
-            add(Bullet(randomRadians, 'Bullet $i'));
+            var angle = _rng.nextDouble() * 360;
+            var radians = angle * pi / 180;
+            Vector2 position = Vector2(gameSizeOfRadius * cos(radians) , gameSizeOfRadius * sin(radians)).translated(size.x / 2, size.y /2);
+            add(Bullet(position));
           }
         })
       ..onTick());
