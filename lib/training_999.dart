@@ -7,13 +7,16 @@ import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
+import 'package:training999/components/bullet_text.dart';
 
-class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerComponents {
+class Training999 extends FlameGame
+    with DragCallbacks, HasKeyboardHandlerComponents {
   late Airplane player;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
   final Random _rng = Random();
   late double gameSizeOfRadius;
+  int bulletCount = 0;
 
   Training999() : super();
 
@@ -30,16 +33,25 @@ class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerCompon
   Future onLoad() async {
     // debugMode = kDebugMode;
     await images.loadAllImages();
-    gameSizeOfRadius = pow(pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2), 0.5) / 2.0;
+    gameSizeOfRadius = pow(
+            pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
+            0.5) /
+        2.0;
     debugPrint('[TONY] gameSizeOfRadius: $gameSizeOfRadius');
     debugPrint('[TONY] game.size: $size');
     debugPrint('[TONY] game.canvasSize: $canvasSize');
     debugPrint('[TONY] camera.viewport.size: ${camera.viewport.size}');
-    debugPrint('[TONY] camera.viewfinder.camera.viewport.size: ${camera.viewfinder.camera.viewport.size}');
+    debugPrint(
+        '[TONY] camera.viewfinder.camera.viewport.size: ${camera.viewfinder.camera.viewport.size}');
 
     add(player = Airplane());
     addJoystick();
     addBullet();
+    addBulletCountText();
+  }
+
+  void addBulletCountText() {
+    add(BulletText());
   }
 
   void addBullet() {
@@ -51,7 +63,9 @@ class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerCompon
           for (var i = 1; i <= 1; i++) {
             var angle = _rng.nextDouble() * 360;
             var radians = angle * pi / 180;
-            Vector2 position = Vector2(gameSizeOfRadius * cos(radians) , gameSizeOfRadius * sin(radians)).translated(size.x / 2, size.y /2);
+            Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
+                    gameSizeOfRadius * sin(radians))
+                .translated(size.x / 2, size.y / 2);
             add(Bullet(position));
           }
         })

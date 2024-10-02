@@ -8,7 +8,8 @@ class Bullet extends CircleComponent
   late Vector2 _velocity;
   late Vector2 direction;
 
-  Bullet(position) : super(
+  Bullet(position)
+      : super(
             position: position,
             radius: 2,
             paint: Paint()..color = Colors.yellow,
@@ -16,6 +17,7 @@ class Bullet extends CircleComponent
 
   @override
   void onRemove() {
+    gameRef.bulletCount++;
     super.onRemove();
   }
 
@@ -30,7 +32,8 @@ class Bullet extends CircleComponent
     var centerX = game.canvasSize.x / 2;
     var centerY = game.canvasSize.y / 2;
 
-    direction = Vector2(centerX > position.x ? 1 : -1, centerY > position.y ? 1 : -1);
+    direction =
+        Vector2(centerX > position.x ? 1 : -1, centerY > position.y ? 1 : -1);
 
     _velocity = random * 100 + Vector2(direction.x, direction.y);
   }
