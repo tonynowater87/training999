@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_text.dart';
+import 'package:training999/components/explosion.dart';
 
 class Training999 extends FlameGame
     with
@@ -114,7 +115,7 @@ class Training999 extends FlameGame
 
   @override
   void onTapUp(TapUpEvent event) {
-    removeWhere((c) => c is Bullet || c is TimerComponent);
+    removeWhere((c) => c is Bullet || c is TimerComponent || c is ExplosionComponent);
     Future.delayed(const Duration(seconds: 1), () {
       reset();
     });

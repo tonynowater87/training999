@@ -1,6 +1,7 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:training999/components/explosion.dart';
 import 'package:training999/training_999.dart';
 
 import 'bullet.dart';
@@ -52,8 +53,8 @@ class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, Co
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
-    debugPrint('[TONY] Airplane collided with something!');
     if (other is Bullet) {
+      explode();
       gameRef.isGameOver = true;
       debugPrint('[TONY] Airplane collided with bullet!');
     }
@@ -87,5 +88,9 @@ class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, Co
       position.y = size.y / 2;
     }
     super.update(dt);
+  }
+
+  void explode() {
+    game.add(ExplosionComponent(position: position));
   }
 }
