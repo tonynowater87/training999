@@ -4,13 +4,13 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_text.dart';
 
-class Training999 extends FlameGame
-    with DragCallbacks, HasKeyboardHandlerComponents {
+class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerComponents, HasCollisionDetection {
   late Airplane player;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
@@ -25,29 +25,23 @@ class Training999 extends FlameGame
 
   @override
   void stepEngine({double stepTime = 1 / 60}) {
-    debugPrint('[TONY] stepEngine: $stepTime');
     super.stepEngine();
   }
 
   @override
   Future onLoad() async {
-    // debugMode = kDebugMode;
+    debugMode = kDebugMode;
     await images.loadAllImages();
     gameSizeOfRadius = pow(
             pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
             0.5) /
         2.0;
-    debugPrint('[TONY] gameSizeOfRadius: $gameSizeOfRadius');
-    debugPrint('[TONY] game.size: $size');
-    debugPrint('[TONY] game.canvasSize: $canvasSize');
-    debugPrint('[TONY] camera.viewport.size: ${camera.viewport.size}');
-    debugPrint(
-        '[TONY] camera.viewfinder.camera.viewport.size: ${camera.viewfinder.camera.viewport.size}');
+    debugPrint('[TONY] game.size: $size, gameSizeOfRadius: $gameSizeOfRadius');
 
     add(player = Airplane());
-    addJoystick();
     addBullet();
     addBulletCountText();
+    addJoystick();
   }
 
   void addBulletCountText() {

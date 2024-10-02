@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'bullet.dart';
 
 class Airplane extends SpriteAnimationComponent
-    with HasGameRef, HasCollisionDetection, CollisionCallbacks {
+    with HasGameRef, CollisionCallbacks {
   Airplane() : super(size: Vector2(32, 39), anchor: Anchor.center);
 
   @override
@@ -32,11 +32,6 @@ class Airplane extends SpriteAnimationComponent
     if (other is Bullet) {
       debugPrint('[TONY] Airplane collided with bullet!');
     }
-  }
-
-  @override
-  void onCollision(Set<Vector2> intersectionPoints, PositionComponent other) {
-    super.onCollision(intersectionPoints, other);
   }
 
   @override
