@@ -4,11 +4,12 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_text.dart';
 import 'package:training999/components/explosion.dart';
+import 'package:training999/page/splash_page.dart';
 
 class Training999 extends FlameGame
     with
@@ -22,6 +23,7 @@ class Training999 extends FlameGame
   late double gameSizeOfRadius;
   int bulletCount = 0;
   bool isGameOver = false;
+  late final RouterComponent router;
 
   Training999() : super();
 
@@ -39,6 +41,11 @@ class Training999 extends FlameGame
   @override
   Future onLoad() async {
     // debugMode = kDebugMode;
+
+    add(router = RouterComponent(initialRoute: "splash",
+        routes: { 'splash': Route(SplashScreenPage.new) }
+    ));
+
     await images.loadAllImages();
     gameSizeOfRadius = pow(
             pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),

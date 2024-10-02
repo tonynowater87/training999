@@ -20,6 +20,12 @@ class BulletText extends TextComponent with HasGameRef<Training999> {
 
   @override
   void update(double dt) {
+    if (gameRef.isGameOver) {
+      lastTime = 0;
+      playTime = 0;
+      return;
+    }
+
     var dateTime = DateTime.now();
     if (lastTime == 0) {
       lastTime = dateTime.millisecondsSinceEpoch;
