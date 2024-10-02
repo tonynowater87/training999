@@ -19,7 +19,31 @@ class Airplane extends SpriteAnimationComponent
         textureSize: Vector2(32, 39),
       ),
     );
-    add(RectangleHitbox());
+    add(PolygonHitbox(
+      [
+        Vector2(15, 0),
+        Vector2(11, 7),
+        Vector2(11, 12),
+        Vector2(9, 13),
+        Vector2(9, 17),
+        Vector2(2, 24),
+        Vector2(2, 27),
+        Vector2(4, 27),
+        Vector2(9, 25),
+        Vector2(13, 25),
+        Vector2(13, 29),
+        Vector2(19, 29),
+        Vector2(19, 25),
+        Vector2(23, 25),
+        Vector2(28, 27),
+        Vector2(30, 27),
+        Vector2(30, 24),
+        Vector2(23, 17),
+        Vector2(23, 13),
+        Vector2(21, 12),
+        Vector2(21, 7),
+      ],
+    ));
   }
 
   @override
