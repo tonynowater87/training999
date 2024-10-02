@@ -43,8 +43,10 @@ class Bullet extends CircleComponent
   @override
   void update(double dt) {
     super.update(dt);
+    if (gameRef.isGameOver) {
+      return;
+    }
     position += direction + _velocity * dt;
-
     if (position.y < -game.gameSizeOfRadius / 2 ||
         position.y > game.size.y + game.gameSizeOfRadius / 4 ||
         position.x > game.size.x + game.gameSizeOfRadius / 2 ||

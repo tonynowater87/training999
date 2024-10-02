@@ -4,21 +4,28 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_text.dart';
 
-class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerComponents, HasCollisionDetection {
+class Training999 extends FlameGame
+    with
+        DragCallbacks,
+        HasKeyboardHandlerComponents,
+        TapCallbacks,
+        HasCollisionDetection {
   late Airplane player;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
-  final Random _rng = Random();
   late double gameSizeOfRadius;
   int bulletCount = 0;
+  bool isGameOver = false;
 
   Training999() : super();
+
+  @override
+  bool get pauseWhenBackgrounded => true;
 
   @override
   Color backgroundColor() => const Color(0xFF211F30);
@@ -30,7 +37,7 @@ class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerCompon
 
   @override
   Future onLoad() async {
-    debugMode = kDebugMode;
+    // debugMode = kDebugMode;
     await images.loadAllImages();
     gameSizeOfRadius = pow(
             pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
@@ -49,6 +56,7 @@ class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerCompon
   }
 
   void addBullet() {
+    final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
     add(TimerComponent(
         period: 0.1,
         repeat: true,
@@ -104,7 +112,25 @@ class Training999 extends FlameGame with DragCallbacks, HasKeyboardHandlerCompon
     add(joystickRight);
   }
 
+  @override
+  void onTapUp(TapUpEvent event) {
+    removeWhere((c) => c is Bullet || c is TimerComponent);
+    Future.delayed(const Duration(seconds: 1), () {
+      reset();
+    });
+    super.onTapUp(event);
+  }
+
+  void reset() {
+    addBullet();
+    bulletCount = 0;
+    isGameOver = false;
+  }
+
   void updateJoystick() {
+    if (isGameOver) {
+      return;
+    }
     switch (joystickLeft.direction) {
       case JoystickDirection.left:
         player.position += Vector2(-0.75, 0);

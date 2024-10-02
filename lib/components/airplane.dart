@@ -1,11 +1,11 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:training999/training_999.dart';
 
 import 'bullet.dart';
 
-class Airplane extends SpriteAnimationComponent
-    with HasGameRef, CollisionCallbacks {
+class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, CollisionCallbacks {
   Airplane() : super(size: Vector2(32, 39), anchor: Anchor.center);
 
   @override
@@ -22,10 +22,10 @@ class Airplane extends SpriteAnimationComponent
     add(PolygonHitbox(
       [
         Vector2(15, 0),
-        Vector2(11, 7),
-        Vector2(11, 12),
-        Vector2(9, 13),
-        Vector2(9, 17),
+        Vector2(12, 7),
+        Vector2(12, 12),
+        Vector2(10, 13),
+        Vector2(10, 17),
         Vector2(2, 24),
         Vector2(2, 27),
         Vector2(4, 27),
@@ -54,12 +54,16 @@ class Airplane extends SpriteAnimationComponent
     super.onCollisionStart(intersectionPoints, other);
     debugPrint('[TONY] Airplane collided with something!');
     if (other is Bullet) {
+      gameRef.isGameOver = true;
       debugPrint('[TONY] Airplane collided with bullet!');
     }
   }
 
   @override
   void update(double dt) {
+    if (gameRef.isGameOver) {
+      return;
+    }
     // check if the airplane is out of the screen
     if (position.x - (size.x / 2) <= 0 &&
         position.y + size.y / 2 >= game.canvasSize.y) {
