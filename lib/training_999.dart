@@ -9,6 +9,8 @@ import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_text.dart';
 import 'package:training999/components/explosion.dart';
+import 'package:training999/page/game_over_page.dart';
+import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
 
 class Training999 extends FlameGame
@@ -17,12 +19,14 @@ class Training999 extends FlameGame
         HasKeyboardHandlerComponents,
         TapCallbacks,
         HasCollisionDetection {
+
   late Airplane player;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
   late double gameSizeOfRadius;
   int bulletCount = 0;
   bool isGameOver = false;
+  int level = 1;
   late final RouterComponent router;
 
   Training999() : super();
@@ -43,7 +47,11 @@ class Training999 extends FlameGame
     // debugMode = kDebugMode;
 
     add(router = RouterComponent(initialRoute: "splash",
-        routes: { 'splash': Route(SplashScreenPage.new) }
+        routes: {
+          'splash': Route(SplashPage.new),
+          'menu': Route(MenuPage.new),
+          'gameover': Route(GameOverPage.new),
+        }
     ));
 
     await images.loadAllImages();
@@ -52,11 +60,20 @@ class Training999 extends FlameGame
             0.5) /
         2.0;
     debugPrint('[TONY] game.size: $size, gameSizeOfRadius: $gameSizeOfRadius');
+    player = Airplane();
+    initJoystick();
+  }
 
-    add(player = Airplane());
+  void start() {
+    isGameOver = false;
+    if (!contains(player)) {
+      add(player);
+    }
+    if (!contains(joystickLeft) || !contains(joystickRight)) {
+      addJoystick();
+    }
     addBullet();
     addBulletCountText();
-    addJoystick();
   }
 
   void addBulletCountText() {
@@ -64,22 +81,25 @@ class Training999 extends FlameGame
   }
 
   void addBullet() {
-    final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
-    add(TimerComponent(
-        period: 0.1,
-        repeat: true,
-        autoStart: true,
-        onTick: () {
-          for (var i = 1; i <= 1; i++) {
-            var angle = _rng.nextDouble() * 360;
-            var radians = angle * pi / 180;
-            Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
-                    gameSizeOfRadius * sin(radians))
-                .translated(size.x / 2, size.y / 2);
-            add(Bullet(position));
-          }
-        })
-      ..onTick());
+    for (var i = 1; i <= level; i++) {
+      final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
+      debugPrint('[TONY] _rng: ${_rng.hashCode}');
+      add(TimerComponent(
+          period: 0.1,
+          repeat: true,
+          autoStart: true,
+          onTick: () {
+            for (var i = 1; i <= 1; i++) {
+              var angle = _rng.nextDouble() * 360;
+              var radians = angle * pi / 180;
+              Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
+                  gameSizeOfRadius * sin(radians))
+                  .translated(size.x / 2, size.y / 2);
+              add(Bullet(position));
+            }
+          })
+        ..onTick());
+    }
   }
 
   @override
@@ -88,7 +108,7 @@ class Training999 extends FlameGame
     super.update(dt);
   }
 
-  void addJoystick() {
+  void initJoystick() {
     joystickLeft = JoystickComponent(
         priority: 10,
         knob: SpriteComponent(
@@ -102,8 +122,6 @@ class Training999 extends FlameGame
           ),
         ),
         position: Vector2(64, canvasSize.y - 64));
-    add(joystickLeft);
-
     joystickRight = JoystickComponent(
         priority: 10,
         knob: SpriteComponent(
@@ -117,22 +135,22 @@ class Training999 extends FlameGame
           ),
         ),
         position: Vector2(canvasSize.x - 64, canvasSize.y - 64));
+  }
+
+  void addJoystick() {
+    add(joystickLeft);
     add(joystickRight);
   }
 
   @override
   void onTapUp(TapUpEvent event) {
-    removeWhere((c) => c is Bullet || c is TimerComponent || c is ExplosionComponent);
-    Future.delayed(const Duration(seconds: 1), () {
-      reset();
-    });
     super.onTapUp(event);
   }
 
   void reset() {
-    addBullet();
+    removeWhere((c) => c is Bullet || c is TimerComponent || c is ExplosionComponent || c is BulletText);
+    level = 1;
     bulletCount = 0;
-    isGameOver = false;
   }
 
   void updateJoystick() {

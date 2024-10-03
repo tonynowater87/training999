@@ -1,18 +1,14 @@
 import 'package:flame/components.dart';
-import 'package:flame/events.dart';
 import 'package:flame/palette.dart';
 import 'package:flame/text.dart';
 import 'package:training999/training_999.dart';
 
-class SplashPage extends Component with HasGameReference<Training999>, TapCallbacks {
-
-  late TextComponent _text;
-
+class SplashScreenPage extends Component with HasGameReference<Training999> {
   @override
   Future<void> onLoad() async {
     addAll([
-      _text = TextBoxComponent(
-        text: '特訓九九九',
+      TextBoxComponent(
+        text: '[Router demo]',
         textRenderer: TextPaint(
           style: const TextStyle(
             color: Color(0x66ffffff),
@@ -27,11 +23,4 @@ class SplashPage extends Component with HasGameReference<Training999>, TapCallba
 
   @override
   bool containsLocalPoint(Vector2 point) => true;
-
-  @override
-  void onTapUp(TapUpEvent event) {
-    remove(_text);
-    game.router.pushNamed('menu');
-    super.onTapUp(event);
-  }
 }
