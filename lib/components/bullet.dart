@@ -43,6 +43,7 @@ class Bullet extends CircleComponent
   @override
   void update(double dt) {
     super.update(dt);
+    debugPrint('[TONY] Bullet.update() - position: $position, game.size: ${game.size}, isGameOver: ${gameRef.isGameOver}');
     if (gameRef.isGameOver) {
       return;
     }

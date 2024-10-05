@@ -32,7 +32,8 @@ class BulletText extends TextComponent with HasGameRef<Training999> {
     }
     var now = dateTime.millisecondsSinceEpoch;
     playTime = now - lastTime;
-    text = '${formatMilliseconds(playTime)} Level: ${gameRef.level}';
+
+    text = '${formatMilliseconds(playTime)} Level: ${gameRef.defaultLevel}';
     // TODO display bullet count
     // text = 'Bullet: ${gameRef.bulletCount}';
     super.update(dt);

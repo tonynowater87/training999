@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:training999/components/rounded_button.dart';
 import 'package:training999/training_999.dart';
@@ -8,6 +9,7 @@ import 'package:training999/training_999.dart';
 class MenuPage extends Component with HasGameReference<Training999> {
   @override
   Future<void> onLoad() async {
+    debugPrint('[TONY] MenuPage.onLoad()');
     addAll([
       _logo = TextComponent(
         text: '特訓999',
@@ -23,27 +25,32 @@ class MenuPage extends Component with HasGameReference<Training999> {
       _button1 = RoundedButton(
         text: '開始遊戲',
         action: () {
-          remove(_logo);
-          remove(_button1);
-          remove(_button2);
-          remove(_button3);
+          game.router.pop();
           game.start();
         },
         color: const Color(0xffadde6c),
         borderColor: const Color(0xffedffab),
       ),
       _button2 = RoundedButton(
-        text: '+',
+        text: '地獄',
         action: () {
-          game.defaultLevel++;
+          game.defaultLevel = 5;
         },
         color: const Color(0xffadde6c),
         borderColor: const Color(0xffedffab),
       ),
       _button3 = RoundedButton(
-        text: '-',
+        text: '普通',
         action: () {
-          game.defaultLevel--;
+          game.defaultLevel = 2;
+        },
+        color: const Color(0xffadde6c),
+        borderColor: const Color(0xffedffab),
+      ),
+      _button4 = RoundedButton(
+        text: '簡單',
+        action: () {
+          game.defaultLevel = 1;
         },
         color: const Color(0xffadde6c),
         borderColor: const Color(0xffedffab),
@@ -55,6 +62,7 @@ class MenuPage extends Component with HasGameReference<Training999> {
   late final RoundedButton _button1;
   late final RoundedButton _button2;
   late final RoundedButton _button3;
+  late final RoundedButton _button4;
 
   @override
   void onGameResize(Vector2 size) {
@@ -62,7 +70,8 @@ class MenuPage extends Component with HasGameReference<Training999> {
     _logo.position = Vector2(size.x / 2, size.y / 3);
     _button1.position = Vector2(size.x / 2, _logo.y + 80);
     _button2.position = Vector2(size.x / 2, _logo.y + 140);
-    _button3.position = Vector2(size.x / 2, _logo.y + 200);
+    _button3.position = Vector2(size.x / 3 - 10, _logo.y + 140);
+    _button4.position = Vector2(size.x - size.x / 3 + 10, _logo.y + 140);
   }
 
   @override

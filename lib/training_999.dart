@@ -19,14 +19,14 @@ class Training999 extends FlameGame
         HasKeyboardHandlerComponents,
         TapCallbacks,
         HasCollisionDetection {
-
   late Airplane player;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
   late double gameSizeOfRadius;
   int bulletCount = 0;
   bool isGameOver = false;
-  int level = 1;
+  int defaultLevel = 2;
+  int gameTime = 0;
   late final RouterComponent router;
 
   Training999() : super();
@@ -46,13 +46,11 @@ class Training999 extends FlameGame
   Future onLoad() async {
     // debugMode = kDebugMode;
 
-    add(router = RouterComponent(initialRoute: "splash",
-        routes: {
-          'splash': Route(SplashPage.new),
-          'menu': Route(MenuPage.new),
-          'gameover': Route(GameOverPage.new),
-        }
-    ));
+    add(router = RouterComponent(initialRoute: "splash", routes: {
+      'splash': Route(SplashPage.new),
+      'menu': Route(MenuPage.new),
+      'gameover': Route(GameOverPage.new),
+    }));
 
     await images.loadAllImages();
     gameSizeOfRadius = pow(
@@ -72,8 +70,25 @@ class Training999 extends FlameGame
     if (!contains(joystickLeft) || !contains(joystickRight)) {
       addJoystick();
     }
-    addBullet();
+
+    for (var i = 1; i <= defaultLevel; i++) {
+      addBullet();
+    }
     addBulletCountText();
+    add(TimerComponent(
+        period: 1,
+        repeat: true,
+        autoStart: true,
+        onTick: () {
+          if (isGameOver) {
+            return;
+          }
+          gameTime++;
+          if (gameTime % 10 == 0) {
+            addBullet();
+          }
+          debugPrint('[TONY] TimerComponent.onTick() called! gameTime: $gameTime');
+        }));
   }
 
   void addBulletCountText() {
@@ -81,25 +96,23 @@ class Training999 extends FlameGame
   }
 
   void addBullet() {
-    for (var i = 1; i <= level; i++) {
-      final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
-      debugPrint('[TONY] _rng: ${_rng.hashCode}');
-      add(TimerComponent(
-          period: 0.1,
-          repeat: true,
-          autoStart: true,
-          onTick: () {
-            for (var i = 1; i <= 1; i++) {
-              var angle = _rng.nextDouble() * 360;
-              var radians = angle * pi / 180;
-              Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
-                  gameSizeOfRadius * sin(radians))
-                  .translated(size.x / 2, size.y / 2);
-              add(Bullet(position));
-            }
-          })
-        ..onTick());
-    }
+    final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
+    debugPrint('[TONY] addBullet() called! _rng: ${_rng.hashCode}');
+    add(TimerComponent(
+        period: 0.1,
+        repeat: true,
+        autoStart: true,
+        onTick: () {
+          for (var i = 1; i <= 1; i++) {
+            var angle = _rng.nextDouble() * 360;
+            var radians = angle * pi / 180;
+            Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
+                    gameSizeOfRadius * sin(radians))
+                .translated(size.x / 2, size.y / 2);
+            add(Bullet(position));
+          }
+        })
+      ..onTick());
   }
 
   @override
@@ -148,9 +161,14 @@ class Training999 extends FlameGame
   }
 
   void reset() {
-    removeWhere((c) => c is Bullet || c is TimerComponent || c is ExplosionComponent || c is BulletText);
-    level = 1;
+    removeWhere((c) =>
+        c is Bullet ||
+        c is TimerComponent ||
+        c is ExplosionComponent ||
+        c is BulletText);
+    defaultLevel = 2;
     bulletCount = 0;
+    gameTime = 0;
   }
 
   void updateJoystick() {
