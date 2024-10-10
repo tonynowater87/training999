@@ -16,12 +16,6 @@ class Bullet extends CircleComponent
             anchor: Anchor.center);
 
   @override
-  void onRemove() {
-    gameRef.bulletCount++;
-    super.onRemove();
-  }
-
-  @override
   Future<void> onLoad() async {
     super.onLoad();
 

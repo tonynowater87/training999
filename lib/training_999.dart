@@ -28,6 +28,8 @@ class Training999 extends FlameGame
   bool isGameOver = false;
   int defaultLevel = 2;
   int gameTime = 0;
+  int lastTime = 0;
+  int surviveTime = 0;
   late final RouterComponent router;
 
   Training999() : super();
@@ -76,7 +78,6 @@ class Training999 extends FlameGame
     for (var i = 1; i <= defaultLevel; i++) {
       addBullet();
     }
-    addBulletCountText();
     add(TimerComponent(
         period: 1,
         repeat: true,
@@ -94,6 +95,7 @@ class Training999 extends FlameGame
   }
 
   void addBulletCountText() {
+    calcBulletCount();
     add(BulletText());
   }
 
@@ -120,6 +122,14 @@ class Training999 extends FlameGame
   @override
   void update(double dt) {
     updateJoystick();
+    if (!isGameOver) {
+      var dateTime = DateTime.now();
+      if (lastTime == 0) {
+        lastTime = dateTime.millisecondsSinceEpoch;
+      }
+      var now = dateTime.millisecondsSinceEpoch;
+      surviveTime = now - lastTime;
+    }
     super.update(dt);
   }
 
@@ -157,13 +167,7 @@ class Training999 extends FlameGame
     add(joystickRight);
   }
 
-  @override
-  void onTapUp(TapUpEvent event) {
-    super.onTapUp(event);
-  }
-
   void gameover() {
-    debugPrint('[TONY] gameover() called!');
     isGameOver = true;
     removeWhere((c) => c is TimerComponent);
   }
@@ -177,6 +181,8 @@ class Training999 extends FlameGame
     defaultLevel = 2;
     bulletCount = 0;
     gameTime = 0;
+    surviveTime = 0;
+    lastTime = 0;
   }
 
   void updateJoystick() {
@@ -243,5 +249,9 @@ class Training999 extends FlameGame
         break;
     }
     player.position += joystickLeft.relativeDelta + joystickRight.relativeDelta;
+  }
+
+  void calcBulletCount() {
+    bulletCount = children.whereType<Bullet>().length;
   }
 }

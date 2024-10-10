@@ -30,48 +30,18 @@ class MenuPage extends Component with HasGameReference<Training999> {
         },
         color: const Color(0xffadde6c),
         borderColor: const Color(0xffedffab),
-      ),
-      _button2 = RoundedButton(
-        text: '地獄',
-        action: () {
-          game.defaultLevel = 5;
-        },
-        color: const Color(0xffadde6c),
-        borderColor: const Color(0xffedffab),
-      ),
-      _button3 = RoundedButton(
-        text: '普通',
-        action: () {
-          game.defaultLevel = 2;
-        },
-        color: const Color(0xffadde6c),
-        borderColor: const Color(0xffedffab),
-      ),
-      _button4 = RoundedButton(
-        text: '簡單',
-        action: () {
-          game.defaultLevel = 1;
-        },
-        color: const Color(0xffadde6c),
-        borderColor: const Color(0xffedffab),
       )
     ]);
   }
 
   late final TextComponent _logo;
   late final RoundedButton _button1;
-  late final RoundedButton _button2;
-  late final RoundedButton _button3;
-  late final RoundedButton _button4;
 
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
     _logo.position = Vector2(size.x / 2, size.y / 3);
     _button1.position = Vector2(size.x / 2, _logo.y + 80);
-    _button2.position = Vector2(size.x / 2, _logo.y + 140);
-    _button3.position = Vector2(size.x / 3 - 10, _logo.y + 140);
-    _button4.position = Vector2(size.x - size.x / 3 + 10, _logo.y + 140);
   }
 
   @override

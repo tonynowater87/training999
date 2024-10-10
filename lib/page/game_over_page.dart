@@ -1,6 +1,7 @@
 
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:training999/components/rounded_button.dart';
 import 'package:training999/training_999.dart';
 
@@ -10,7 +11,7 @@ class GameOverPage extends Component with HasGameReference<Training999> {
 
   @override
   Future<void> onLoad() async {
-
+    debugPrint('[TONY] GameOverPage.onLoad()');
     _playAgainButton = RoundedButton(
       text: 'Play Again',
       action: () {
@@ -23,6 +24,13 @@ class GameOverPage extends Component with HasGameReference<Training999> {
     );
 
     add(_playAgainButton);
+  }
+
+  @override
+  void onMount() {
+    debugPrint('[TONY] GameOverPage.onMount()');
+    game.addBulletCountText();
+    super.onMount();
   }
 
   @override
