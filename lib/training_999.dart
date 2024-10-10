@@ -9,6 +9,7 @@ import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_text.dart';
 import 'package:training999/components/explosion.dart';
+import 'package:training999/components/star_background_creator.dart';
 import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
@@ -59,6 +60,7 @@ class Training999 extends FlameGame
         2.0;
     debugPrint('[TONY] game.size: $size, gameSizeOfRadius: $gameSizeOfRadius');
     player = Airplane();
+    add(StarBackGroundCreator());
     initJoystick();
   }
 
@@ -158,6 +160,12 @@ class Training999 extends FlameGame
   @override
   void onTapUp(TapUpEvent event) {
     super.onTapUp(event);
+  }
+
+  void gameover() {
+    debugPrint('[TONY] gameover() called!');
+    isGameOver = true;
+    removeWhere((c) => c is TimerComponent);
   }
 
   void reset() {

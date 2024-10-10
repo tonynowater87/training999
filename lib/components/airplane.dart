@@ -55,7 +55,7 @@ class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, Co
     super.onCollisionStart(intersectionPoints, other);
     if (other is Bullet) {
       explode();
-      gameRef.isGameOver = true;
+      gameRef.gameover();
       gameRef.router.pushNamed("gameover");
       debugPrint('[TONY] Airplane collided with bullet!');
     }
