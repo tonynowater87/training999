@@ -8,6 +8,7 @@ class ExplosionComponent extends SpriteAnimationComponent
           size: Vector2.all(50),
           anchor: Anchor.center,
           removeOnFinish: false,
+          priority: 200
         );
 
   @override

@@ -7,7 +7,7 @@ import 'package:training999/training_999.dart';
 import 'bullet.dart';
 
 class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, CollisionCallbacks {
-  Airplane() : super(size: Vector2(32, 39), anchor: Anchor.center);
+  Airplane() : super(size: Vector2(32, 39), anchor: Anchor.center, priority: 100);
 
   @override
   Future<void> onLoad() async {
