@@ -46,7 +46,7 @@ class Training999 extends FlameGame
   // 0xFF001030
   // 0xFF000030
   @override
-  Color backgroundColor() => const Color(0xFF000000);
+  Color backgroundColor() => const Color(0xFF001030);
 
   @override
   void stepEngine({double stepTime = 1 / 60}) {
@@ -179,11 +179,13 @@ class Training999 extends FlameGame
     joystickLeft = JoystickComponent(
         priority: 10,
         knob: SpriteComponent(
+          size: Vector2(50, 50),
           sprite: Sprite(
             images.fromCache('Knob.png'),
           ),
         ),
         background: SpriteComponent(
+          size: Vector2(64, 64),
           sprite: Sprite(
             images.fromCache('Joystick.png'),
           ),
@@ -192,11 +194,13 @@ class Training999 extends FlameGame
     joystickRight = JoystickComponent(
         priority: 10,
         knob: SpriteComponent(
+          size: Vector2(50, 50),
           sprite: Sprite(
             images.fromCache('Knob.png'),
           ),
         ),
         background: SpriteComponent(
+          size: Vector2(64, 64),
           sprite: Sprite(
             images.fromCache('Joystick.png'),
           ),
