@@ -37,8 +37,10 @@ class Training999 extends FlameGame
   @override
   bool get pauseWhenBackgrounded => true;
 
+  // 0xFF001030
+  // 0xFF000030
   @override
-  Color backgroundColor() => const Color(0xFF211F30);
+  Color backgroundColor() => const Color(0xFF000000);
 
   @override
   void stepEngine({double stepTime = 1 / 60}) {
