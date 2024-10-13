@@ -2,8 +2,7 @@ import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:training999/training_999.dart';
-
-enum BulletLevel { easy, middle, hard }
+import 'package:training999/util/bullet_level.dart';
 
 class Bullet extends CircleComponent
     with HasGameRef<Training999>, CollisionCallbacks {
@@ -12,10 +11,7 @@ class Bullet extends CircleComponent
   BulletLevel bulletLevel;
 
   Bullet(position, this.bulletLevel)
-      : super(
-            position: position,
-            radius: 2,
-            anchor: Anchor.center);
+      : super(position: position, radius: 2, anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
@@ -28,21 +24,8 @@ class Bullet extends CircleComponent
 
     direction =
         Vector2(centerX > position.x ? 1 : -1, centerY > position.y ? 1 : -1);
-
-    switch (bulletLevel) {
-      case BulletLevel.easy:
-        _velocity = Vector2(direction.x * 50, direction.y * 50);
-        paint = Paint()..color = Colors.orange;
-        break;
-      case BulletLevel.middle:
-        _velocity = Vector2(direction.x * 100, direction.y * 100);
-        paint = Paint()..color = Colors.yellow;
-        break;
-      case BulletLevel.hard:
-        _velocity = Vector2(direction.x * 200, direction.y * 200);
-        paint = Paint()..color = Colors.red;
-        break;
-    }
+    paint = Paint()..color = bulletLevel.getColor();
+    _velocity = bulletLevel.getVelocity(direction);
   }
 
   @override

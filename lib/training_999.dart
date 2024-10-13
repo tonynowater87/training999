@@ -14,6 +14,7 @@ import 'package:training999/components/star_background_creator.dart';
 import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
+import 'package:training999/util/bullet_level.dart';
 
 class Training999 extends FlameGame
     with
@@ -31,7 +32,6 @@ class Training999 extends FlameGame
   late double gameSizeOfRadius;
   int bulletCount = 0;
   bool isGameOver = false;
-  BulletLevel bulletLevel = BulletLevel.easy;
   int gameTime = 0;
   int lastTime = 0;
   int surviveTime = 0;
@@ -93,17 +93,15 @@ class Training999 extends FlameGame
             return;
           }
           if (gameTime % 10 == 0) {
-            addBullet();
+            addBullet(BulletLevel.easy);
           }
 
-          if (gameTime == 20) {
-            bulletLevel = BulletLevel.middle;
-            addBullet();
+          if (gameTime > 0 && gameTime % 20 == 0) {
+            addBullet(BulletLevel.middle);
           }
 
-          if (gameTime == 30) {
-            bulletLevel = BulletLevel.hard;
-            addBullet();
+          if (gameTime > 0 && gameTime % 30 == 0) {
+            addBullet(BulletLevel.hard);
           }
           gameTime++;
           debugPrint('[TONY] TimerComponent.onTick() called! gameTime: $gameTime');
@@ -115,22 +113,20 @@ class Training999 extends FlameGame
     add(BulletText());
   }
 
-  void addBullet() {
+  void addBullet(BulletLevel bulletLevel) {
     final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
     debugPrint('[TONY] addBullet() called! _rng: ${_rng.hashCode}');
     add(TimerComponent(
-        period: getPeriodByLevel(),
+        period: bulletLevel.getPeriod(),
         repeat: true,
         removeOnFinish: true,
         onTick: () {
-          for (var i = 1; i <= 1; i++) {
-            var angle = _rng.nextDouble() * 360;
-            var radians = angle * pi / 180;
-            Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
-                    gameSizeOfRadius * sin(radians))
-                .translated(size.x / 2, size.y / 2);
-            add(Bullet(position, bulletLevel));
-          }
+          var angle = _rng.nextDouble() * 360;
+          var radians = angle * pi / 180;
+          Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
+                  gameSizeOfRadius * sin(radians))
+              .translated(size.x / 2, size.y / 2);
+          add(Bullet(position, bulletLevel));
         }));
   }
 
@@ -224,7 +220,6 @@ class Training999 extends FlameGame
         c is TimerComponent ||
         c is ExplosionComponent ||
         c is BulletText);
-    bulletLevel = BulletLevel.easy;
     bulletCount = 0;
     gameTime = 0;
     surviveTime = 0;
@@ -320,19 +315,6 @@ class Training999 extends FlameGame
     if (pressedKeySets.contains(LogicalKeyboardKey.arrowRight) ||
         pressedKeySets.contains(LogicalKeyboardKey.keyD)) {
       player.position += Vector2(_keyControllerConstant, 0);
-    }
-  }
-
-  double getPeriodByLevel() {
-    switch (bulletLevel) {
-      case BulletLevel.easy:
-        return 0.1;
-      case BulletLevel.middle:
-        return 1.0;
-      case BulletLevel.hard:
-        return 2.0;
-      default:
-        return -1.0;
     }
   }
 }
