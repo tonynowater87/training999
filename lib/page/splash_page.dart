@@ -1,10 +1,9 @@
 import 'package:flame/components.dart';
-import 'package:flame/events.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/rendering.dart';
 import 'package:training999/training_999.dart';
 
-class SplashPage extends Component with HasGameReference<Training999>, TapCallbacks {
+class SplashPage extends Component with HasGameReference<Training999> {
 
   late TextComponent _logo;
 
@@ -39,12 +38,5 @@ class SplashPage extends Component with HasGameReference<Training999>, TapCallba
     remove(_logo);
     game.router.pushNamed('menu');
     super.onMount();
-  }
-
-  @override
-  void onTapUp(TapUpEvent event) {
-    remove(_logo);
-    game.router.pushNamed('menu');
-    super.onTapUp(event);
   }
 }

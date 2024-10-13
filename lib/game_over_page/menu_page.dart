@@ -35,7 +35,7 @@ class MenuPage extends Component with HasGameReference<Training999> {
       _button2 = RoundedButton(
         text: '+',
         action: () {
-          game.defaultLevel++;
+          game.level++;
         },
         color: const Color(0xffadde6c),
         borderColor: const Color(0xffedffab),
@@ -43,7 +43,7 @@ class MenuPage extends Component with HasGameReference<Training999> {
       _button3 = RoundedButton(
         text: '-',
         action: () {
-          game.defaultLevel--;
+          game.level--;
         },
         color: const Color(0xffadde6c),
         borderColor: const Color(0xffedffab),

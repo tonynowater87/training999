@@ -18,7 +18,7 @@ class BulletText extends TextComponent with HasGameRef<Training999> {
 
   @override
   void update(double dt) {
-    text = 'SurviveTime:${formatMilliseconds(game.surviveTime)}, Level: ${gameRef.defaultLevel}, Bullet: ${gameRef.bulletCount}';
+    text = 'SurviveTime:${formatMilliseconds(game.surviveTime)}, Level: ${gameRef.level}, Bullet: ${gameRef.bulletCount}';
     super.update(dt);
   }
 }

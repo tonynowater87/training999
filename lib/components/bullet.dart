@@ -1,14 +1,19 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 import 'package:training999/training_999.dart';
 
+enum BulletLevel { easy, middle, hard }
+
 class Bullet extends CircleComponent
     with HasGameRef<Training999>, CollisionCallbacks {
   late Vector2 _velocity;
   late Vector2 direction;
+  BulletLevel bulletLevel;
 
-  Bullet(position)
+  Bullet(position, this.bulletLevel)
       : super(
             position: position,
             radius: 2,
@@ -19,7 +24,7 @@ class Bullet extends CircleComponent
   Future<void> onLoad() async {
     super.onLoad();
 
-    var random = Vector2.random();
+    var random = Vector2.random(Random(DateTime.now().millisecond));
 
     add(CircleHitbox());
 
@@ -29,15 +34,22 @@ class Bullet extends CircleComponent
     direction =
         Vector2(centerX > position.x ? 1 : -1, centerY > position.y ? 1 : -1);
 
-    _velocity = random * 100 + Vector2(direction.x, direction.y);
+    switch (bulletLevel) {
+      case BulletLevel.easy:
+        _velocity = random * 50 + Vector2(direction.x, direction.y);
+        break;
+      case BulletLevel.middle:
+        _velocity = random * 75 + Vector2(direction.x, direction.y);
+        break;
+      case BulletLevel.hard:
+        _velocity = random * 100 + Vector2(direction.x, direction.y);
+        break;
+    }
   }
-
-  double bufferSize = 35;
 
   @override
   void update(double dt) {
     super.update(dt);
-    // debugPrint('[TONY] Bullet.update() - position: $position, game.size: ${game.size}, isGameOver: ${gameRef.isGameOver}');
     if (gameRef.isGameOver) {
       return;
     }

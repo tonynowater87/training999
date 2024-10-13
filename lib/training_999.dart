@@ -4,7 +4,8 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart' hide Route;
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_text.dart';
@@ -17,20 +18,25 @@ import 'package:training999/page/splash_page.dart';
 class Training999 extends FlameGame
     with
         DragCallbacks,
-        HasKeyboardHandlerComponents,
         TapCallbacks,
-        HasCollisionDetection {
+        HasCollisionDetection,
+        KeyboardEvents {
+
+  static double _joystickControllerConstant = 0.75;
+  static double _keyControllerConstant = 1.5;
+
   late Airplane player;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
   late double gameSizeOfRadius;
   int bulletCount = 0;
   bool isGameOver = false;
-  int defaultLevel = 2;
+  int level = 1;
   int gameTime = 0;
   int lastTime = 0;
   int surviveTime = 0;
   late final RouterComponent router;
+  late Set<LogicalKeyboardKey> pressedKeySets;
 
   Training999() : super();
 
@@ -66,6 +72,7 @@ class Training999 extends FlameGame
     player = Airplane();
     add(StarBackGroundCreator());
     initJoystick();
+    pressedKeySets = {};
   }
 
   void start() {
@@ -77,7 +84,7 @@ class Training999 extends FlameGame
       addJoystick();
     }
 
-    for (var i = 1; i <= defaultLevel; i++) {
+    for (var i = 1; i <= level; i++) {
       addBullet();
     }
     add(TimerComponent(
@@ -115,7 +122,7 @@ class Training999 extends FlameGame
             Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
                     gameSizeOfRadius * sin(radians))
                 .translated(size.x / 2, size.y / 2);
-            add(Bullet(position));
+            add(Bullet(position, BulletLevel.easy));
           }
         })
       ..onTick());
@@ -124,6 +131,7 @@ class Training999 extends FlameGame
   @override
   void update(double dt) {
     updateJoystick();
+    updateKeys();
     if (!isGameOver) {
       var dateTime = DateTime.now();
       if (lastTime == 0) {
@@ -133,6 +141,37 @@ class Training999 extends FlameGame
       surviveTime = now - lastTime;
     }
     super.update(dt);
+  }
+
+  @override
+  KeyEventResult onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    super.onKeyEvent(event, keysPressed);
+
+    if (isGameOver) {
+      return KeyEventResult.ignored;
+    }
+
+    _clearPressedKeys();
+    for (final key in keysPressed) {
+      debugPrint('[TONY] onKeyEvent() called! key: $key');
+      if (key == LogicalKeyboardKey.arrowUp || key == LogicalKeyboardKey.keyW) {
+        pressedKeySets.add(key);
+      } else if (key == LogicalKeyboardKey.arrowDown || key == LogicalKeyboardKey.keyS) {
+        pressedKeySets.add(key);
+      } else if (key == LogicalKeyboardKey.arrowLeft || key == LogicalKeyboardKey.keyA) {
+        pressedKeySets.add(key);
+      } else if (key == LogicalKeyboardKey.arrowRight || key == LogicalKeyboardKey.keyD) {
+        pressedKeySets.add(key);
+      } else {
+        return KeyEventResult.ignored;
+      }
+    }
+
+    return KeyEventResult.handled;
+  }
+
+  void _clearPressedKeys() {
+    pressedKeySets.clear();
   }
 
   void initJoystick() {
@@ -180,7 +219,7 @@ class Training999 extends FlameGame
         c is TimerComponent ||
         c is ExplosionComponent ||
         c is BulletText);
-    defaultLevel = 2;
+    level = 2;
     bulletCount = 0;
     gameTime = 0;
     surviveTime = 0;
@@ -193,28 +232,28 @@ class Training999 extends FlameGame
     }
     switch (joystickLeft.direction) {
       case JoystickDirection.left:
-        player.position += Vector2(-0.75, 0);
+        player.position += Vector2(-_joystickControllerConstant, 0);
         break;
       case JoystickDirection.upLeft:
-        player.position += Vector2(-0.75, -0.75);
+        player.position += Vector2(-_joystickControllerConstant, -_joystickControllerConstant);
         break;
       case JoystickDirection.up:
-        player.position += Vector2(0, -0.75);
+        player.position += Vector2(0, -_joystickControllerConstant);
         break;
       case JoystickDirection.upRight:
-        player.position += Vector2(0.75, -0.75);
+        player.position += Vector2(_joystickControllerConstant, -_joystickControllerConstant);
         break;
       case JoystickDirection.right:
-        player.position += Vector2(0.75, 0);
+        player.position += Vector2(_joystickControllerConstant, 0);
         break;
       case JoystickDirection.downRight:
-        player.position += Vector2(0.75, 0.75);
+        player.position += Vector2(_joystickControllerConstant, _joystickControllerConstant);
         break;
       case JoystickDirection.down:
-        player.position += Vector2(0, 0.75);
+        player.position += Vector2(0, _joystickControllerConstant);
         break;
       case JoystickDirection.downLeft:
-        player.position += Vector2(-0.75, 0.75);
+        player.position += Vector2(-_joystickControllerConstant, _joystickControllerConstant);
         break;
       default:
         player.position += Vector2(0, 0);
@@ -223,28 +262,28 @@ class Training999 extends FlameGame
 
     switch (joystickRight.direction) {
       case JoystickDirection.left:
-        player.position += Vector2(-0.75, 0);
+        player.position += Vector2(-_joystickControllerConstant, 0);
         break;
       case JoystickDirection.upLeft:
-        player.position += Vector2(-0.75, -0.75);
+        player.position += Vector2(-_joystickControllerConstant, -_joystickControllerConstant);
         break;
       case JoystickDirection.up:
-        player.position += Vector2(0, -0.75);
+        player.position += Vector2(0, -_joystickControllerConstant);
         break;
       case JoystickDirection.upRight:
-        player.position += Vector2(0.75, -0.75);
+        player.position += Vector2(_joystickControllerConstant, -_joystickControllerConstant);
         break;
       case JoystickDirection.right:
-        player.position += Vector2(0.75, 0);
+        player.position += Vector2(_joystickControllerConstant, 0);
         break;
       case JoystickDirection.downRight:
-        player.position += Vector2(0.75, 0.75);
+        player.position += Vector2(_joystickControllerConstant, _joystickControllerConstant);
         break;
       case JoystickDirection.down:
-        player.position += Vector2(0, 0.75);
+        player.position += Vector2(0, _joystickControllerConstant);
         break;
       case JoystickDirection.downLeft:
-        player.position += Vector2(-0.75, 0.75);
+        player.position += Vector2(-_joystickControllerConstant, _joystickControllerConstant);
         break;
       default:
         player.position += Vector2(0, 0);
@@ -255,5 +294,27 @@ class Training999 extends FlameGame
 
   void calcBulletCount() {
     bulletCount = children.whereType<Bullet>().length;
+  }
+
+  void updateKeys() {
+    if (isGameOver) {
+      return;
+    }
+    if (pressedKeySets.contains(LogicalKeyboardKey.arrowUp) ||
+        pressedKeySets.contains(LogicalKeyboardKey.keyW)) {
+      player.position += Vector2(0, -_keyControllerConstant);
+    }
+    if (pressedKeySets.contains(LogicalKeyboardKey.arrowDown) ||
+        pressedKeySets.contains(LogicalKeyboardKey.keyS)) {
+      player.position += Vector2(0, _keyControllerConstant);
+    }
+    if (pressedKeySets.contains(LogicalKeyboardKey.arrowLeft) ||
+        pressedKeySets.contains(LogicalKeyboardKey.keyA)) {
+      player.position += Vector2(-_keyControllerConstant, 0);
+    }
+    if (pressedKeySets.contains(LogicalKeyboardKey.arrowRight) ||
+        pressedKeySets.contains(LogicalKeyboardKey.keyD)) {
+      player.position += Vector2(_keyControllerConstant, 0);
+    }
   }
 }
