@@ -20,7 +20,7 @@ class Training999 extends FlameGame
         DragCallbacks,
         TapCallbacks,
         HasCollisionDetection,
-        KeyboardEvents {
+        HasKeyboardHandlerComponents {
 
   static double _joystickControllerConstant = 0.75;
   static double _keyControllerConstant = 1.5;
@@ -31,7 +31,7 @@ class Training999 extends FlameGame
   late double gameSizeOfRadius;
   int bulletCount = 0;
   bool isGameOver = false;
-  int level = 1;
+  BulletLevel bulletLevel = BulletLevel.easy;
   int gameTime = 0;
   int lastTime = 0;
   int surviveTime = 0;
@@ -83,22 +83,29 @@ class Training999 extends FlameGame
     if (!contains(joystickLeft) || !contains(joystickRight)) {
       addJoystick();
     }
-
-    for (var i = 1; i <= level; i++) {
-      addBullet();
-    }
     add(TimerComponent(
         period: 1,
         repeat: true,
         autoStart: true,
+        removeOnFinish: true,
         onTick: () {
           if (isGameOver) {
             return;
           }
-          gameTime++;
           if (gameTime % 10 == 0) {
             addBullet();
           }
+
+          if (gameTime == 20) {
+            bulletLevel = BulletLevel.middle;
+            addBullet();
+          }
+
+          if (gameTime == 30) {
+            bulletLevel = BulletLevel.hard;
+            addBullet();
+          }
+          gameTime++;
           debugPrint('[TONY] TimerComponent.onTick() called! gameTime: $gameTime');
         }));
   }
@@ -112,9 +119,9 @@ class Training999 extends FlameGame
     final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
     debugPrint('[TONY] addBullet() called! _rng: ${_rng.hashCode}');
     add(TimerComponent(
-        period: 0.1,
+        period: getPeriodByLevel(),
         repeat: true,
-        autoStart: true,
+        removeOnFinish: true,
         onTick: () {
           for (var i = 1; i <= 1; i++) {
             var angle = _rng.nextDouble() * 360;
@@ -122,10 +129,9 @@ class Training999 extends FlameGame
             Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
                     gameSizeOfRadius * sin(radians))
                 .translated(size.x / 2, size.y / 2);
-            add(Bullet(position, BulletLevel.easy));
+            add(Bullet(position, bulletLevel));
           }
-        })
-      ..onTick());
+        }));
   }
 
   @override
@@ -153,7 +159,6 @@ class Training999 extends FlameGame
 
     _clearPressedKeys();
     for (final key in keysPressed) {
-      debugPrint('[TONY] onKeyEvent() called! key: $key');
       if (key == LogicalKeyboardKey.arrowUp || key == LogicalKeyboardKey.keyW) {
         pressedKeySets.add(key);
       } else if (key == LogicalKeyboardKey.arrowDown || key == LogicalKeyboardKey.keyS) {
@@ -219,7 +224,7 @@ class Training999 extends FlameGame
         c is TimerComponent ||
         c is ExplosionComponent ||
         c is BulletText);
-    level = 2;
+    bulletLevel = BulletLevel.easy;
     bulletCount = 0;
     gameTime = 0;
     surviveTime = 0;
@@ -315,6 +320,19 @@ class Training999 extends FlameGame
     if (pressedKeySets.contains(LogicalKeyboardKey.arrowRight) ||
         pressedKeySets.contains(LogicalKeyboardKey.keyD)) {
       player.position += Vector2(_keyControllerConstant, 0);
+    }
+  }
+
+  double getPeriodByLevel() {
+    switch (bulletLevel) {
+      case BulletLevel.easy:
+        return 0.1;
+      case BulletLevel.middle:
+        return 1.0;
+      case BulletLevel.hard:
+        return 2.0;
+      default:
+        return -1.0;
     }
   }
 }

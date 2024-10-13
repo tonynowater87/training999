@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
@@ -17,14 +15,11 @@ class Bullet extends CircleComponent
       : super(
             position: position,
             radius: 2,
-            paint: Paint()..color = Colors.yellow,
             anchor: Anchor.center);
 
   @override
   Future<void> onLoad() async {
     super.onLoad();
-
-    var random = Vector2.random(Random(DateTime.now().millisecond));
 
     add(CircleHitbox());
 
@@ -36,13 +31,16 @@ class Bullet extends CircleComponent
 
     switch (bulletLevel) {
       case BulletLevel.easy:
-        _velocity = random * 50 + Vector2(direction.x, direction.y);
+        _velocity = Vector2(direction.x * 50, direction.y * 50);
+        paint = Paint()..color = Colors.orange;
         break;
       case BulletLevel.middle:
-        _velocity = random * 75 + Vector2(direction.x, direction.y);
+        _velocity = Vector2(direction.x * 100, direction.y * 100);
+        paint = Paint()..color = Colors.yellow;
         break;
       case BulletLevel.hard:
-        _velocity = random * 100 + Vector2(direction.x, direction.y);
+        _velocity = Vector2(direction.x * 200, direction.y * 200);
+        paint = Paint()..color = Colors.red;
         break;
     }
   }
@@ -53,7 +51,7 @@ class Bullet extends CircleComponent
     if (gameRef.isGameOver) {
       return;
     }
-    position += direction + _velocity * dt;
+    position.add(direction + _velocity * dt);
     if (position.y < -game.gameSizeOfRadius / 2 ||
         position.y > game.size.y + game.gameSizeOfRadius / 4 ||
         position.x > game.size.x + game.gameSizeOfRadius / 2 ||

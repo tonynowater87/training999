@@ -2,8 +2,9 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/text.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
-class RoundedButton extends PositionComponent with TapCallbacks {
+class RoundedButton extends PositionComponent with TapCallbacks, KeyboardHandler {
   RoundedButton({
     required this.text,
     required this.action,
@@ -60,5 +61,18 @@ class RoundedButton extends PositionComponent with TapCallbacks {
   @override
   void onTapCancel(TapCancelEvent event) {
     scale = Vector2.all(1.0);
+  }
+
+  @override
+  bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+    if (event.logicalKey == LogicalKeyboardKey.enter && event is KeyUpEvent) {
+      action();
+      return true;
+    }
+    if (event.logicalKey == LogicalKeyboardKey.space && event is KeyUpEvent) {
+      action();
+      return true;
+    }
+    return super.onKeyEvent(event, keysPressed);
   }
 }
