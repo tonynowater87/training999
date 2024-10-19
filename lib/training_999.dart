@@ -10,6 +10,7 @@ import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_text.dart';
 import 'package:training999/components/explosion.dart';
+import 'package:training999/components/info_text.dart';
 import 'package:training999/components/star_background_creator.dart';
 import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
@@ -95,14 +96,17 @@ class Training999 extends FlameGame
 
           if (gameTime == 0) {
             addBullet(BulletLevel.easy);
+            add(InfoTextComponent('Game Start!', Vector2(size.x / 2, 0)));
           }
 
           if (gameTime > 0 && gameTime % 15 == 0) {
             addBullet(BulletLevel.middle);
+            add(InfoTextComponent('高速彈發射!', Vector2(size.x / 2, 0)));
           }
 
-          if (gameTime > 0 && gameTime % 30 == 0) {
+          if (gameTime > 0 && gameTime % 25 == 0) {
             addBullet(BulletLevel.hard);
+            add(InfoTextComponent('誘導彈發射!', Vector2(size.x / 2, 0)));
           }
           gameTime++;
           debugPrint('[TONY] TimerComponent.onTick() called! gameTime: $gameTime');
