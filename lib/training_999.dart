@@ -17,6 +17,8 @@ import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
 import 'package:training999/util/bullet_level.dart';
 
+import 'components/detect_close_to_bullet.dart';
+
 class Training999 extends FlameGame
     with
         DragCallbacks,
@@ -28,6 +30,7 @@ class Training999 extends FlameGame
   static double _keyControllerConstant = 1.5;
 
   late Airplane player;
+  late DetectCloseToBullet detectCloseToBullet;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
   late double gameSizeOfRadius;
@@ -71,6 +74,7 @@ class Training999 extends FlameGame
         2.0;
     debugPrint('[TONY] game.size: $size, gameSizeOfRadius: $gameSizeOfRadius');
     player = Airplane();
+    detectCloseToBullet = DetectCloseToBullet();
     add(StarBackGroundCreator());
     initJoystick();
     pressedKeySets = {};
@@ -80,10 +84,13 @@ class Training999 extends FlameGame
     isGameOver = false;
     if (!contains(player)) {
       add(player);
+      add(detectCloseToBullet);
     }
     if (!contains(joystickLeft) || !contains(joystickRight)) {
       addJoystick();
     }
+
+    detectCloseToBullet.position = player.position;
     add(TimerComponent(
         period: 1,
         repeat: true,
