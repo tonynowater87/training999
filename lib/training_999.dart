@@ -92,11 +92,12 @@ class Training999 extends FlameGame
           if (isGameOver) {
             return;
           }
-          if (gameTime % 10 == 0) {
+
+          if (gameTime == 0) {
             addBullet(BulletLevel.easy);
           }
 
-          if (gameTime > 0 && gameTime % 20 == 0) {
+          if (gameTime > 0 && gameTime % 15 == 0) {
             addBullet(BulletLevel.middle);
           }
 

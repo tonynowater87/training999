@@ -7,7 +7,7 @@ extension BulletLevelExtension on BulletLevel {
   double getPeriod() {
     switch (this) {
       case BulletLevel.easy:
-        return 0.2;
+        return 0.1;
       case BulletLevel.middle:
         return 1.0;
       case BulletLevel.hard:
@@ -31,9 +31,20 @@ extension BulletLevelExtension on BulletLevel {
       case BulletLevel.easy:
         return Vector2(direction.x * 50, direction.y * 50);
       case BulletLevel.middle:
-        return Vector2(direction.x * 100, direction.y * 100);
+        return Vector2(direction.x * 150, direction.y * 100);
       case BulletLevel.hard:
-        return Vector2(direction.x * 200, direction.y * 200);
+        return Vector2(direction.x * 300, direction.y * 200);
+    }
+  }
+
+  double getRadius() {
+    switch (this) {
+      case BulletLevel.easy:
+        return 2;
+      case BulletLevel.middle:
+        return 3;
+      case BulletLevel.hard:
+        return 4;
     }
   }
 }
