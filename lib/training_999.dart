@@ -8,9 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide Route;
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
-import 'package:training999/components/bullet_text.dart';
 import 'package:training999/components/explosion.dart';
 import 'package:training999/components/info_text.dart';
+import 'package:training999/components/score_text.dart';
 import 'package:training999/components/star_background_creator.dart';
 import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
@@ -39,6 +39,7 @@ class Training999 extends FlameGame
   int gameTime = 0;
   int lastTime = 0;
   int surviveTime = 0;
+  int brilliantlyDodgedTheBullet = 0;
   late final RouterComponent router;
   late Set<LogicalKeyboardKey> pressedKeySets;
 
@@ -122,7 +123,7 @@ class Training999 extends FlameGame
 
   void addBulletCountText() {
     calcBulletCount();
-    add(BulletText());
+    add(ScoreText());
   }
 
   void addBullet(BulletLevel bulletLevel) {
@@ -140,6 +141,11 @@ class Training999 extends FlameGame
               .translated(size.x / 2, size.y / 2);
           add(Bullet(position, bulletLevel));
         }));
+  }
+
+  void addBrilliantlyDodgedTheBulletText() {
+    brilliantlyDodgedTheBullet++;
+    add(InfoTextComponent('絕妙度過子彈！', size / 2));
   }
 
   @override
@@ -235,11 +241,12 @@ class Training999 extends FlameGame
         c is Bullet ||
         c is TimerComponent ||
         c is ExplosionComponent ||
-        c is BulletText);
+        c is ScoreText);
     bulletCount = 0;
     gameTime = 0;
     surviveTime = 0;
     lastTime = 0;
+    brilliantlyDodgedTheBullet = 0;
   }
 
   void updateJoystick() {

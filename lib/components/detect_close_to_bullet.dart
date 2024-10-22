@@ -1,7 +1,6 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:training999/components/info_text.dart';
 import 'package:training999/training_999.dart';
 
 import 'bullet.dart';
@@ -48,13 +47,12 @@ class DetectCloseToBullet extends PositionComponent
     super.onCollisionStart(intersectionPoints, other);
     if (other is Bullet) {
       debugPrint('[TONY] 絕妙度過子彈!!!！');
-      game.add(InfoTextComponent("絕妙度過子彈！", game.size / 2));
-      // Future.delayed(const Duration(milliseconds: 1000), () {
-      //   if (gameRef.isGameOver) {
-      //     return;
-      //   }
-      //   game.add(InfoTextComponent("絕妙度過子彈！", game.size / 2));
-      // });
+      Future.delayed(const Duration(milliseconds: 50), () {
+        if (gameRef.isGameOver) {
+          return;
+        }
+        game.addBrilliantlyDodgedTheBulletText();
+      });
     }
   }
 

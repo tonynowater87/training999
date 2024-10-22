@@ -2,7 +2,7 @@ import 'package:flame/components.dart';
 import 'package:training999/training_999.dart';
 import 'package:training999/util/time_utils.dart';
 
-class BulletText extends TextComponent with HasGameRef<Training999> {
+class ScoreText extends TextComponent with HasGameRef<Training999> {
 
   @override
   Future<void> onLoad() async {
@@ -18,7 +18,7 @@ class BulletText extends TextComponent with HasGameRef<Training999> {
 
   @override
   void update(double dt) {
-    text = 'SurviveTime:${formatMilliseconds(game.surviveTime)}, Bullet: ${gameRef.bulletCount}';
+    text = 'SurviveTime:${formatMilliseconds(game.surviveTime)}, Bullet: ${gameRef.bulletCount}, BrilliantlyDodgedTheBullet: ${gameRef.brilliantlyDodgedTheBullet}';
     super.update(dt);
   }
 }
