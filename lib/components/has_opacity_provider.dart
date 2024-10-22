@@ -4,24 +4,24 @@ import 'package:flame/palette.dart';
 import 'package:flutter/material.dart';
 
 mixin HasOpacityProvider on Component implements OpacityProvider {
-  double _opacity = 1;
-  Paint _paint = BasicPalette.white.paint();
+  final Paint _paint = BasicPalette.white.paint();
+  final Paint _srcOverPaint = Paint()..blendMode = BlendMode.srcOver;
 
   @override
-  double get opacity => _opacity;
+  double get opacity => _paint.color.opacity;
 
   @override
-  set opacity(double value) {
-    if (value == _opacity) return;
-    _opacity = value;
-    _paint = Paint()..color = Colors.white.withOpacity(value);
+  set opacity(double newOpacity) {
+    _paint
+      ..color = _paint.color.withOpacity(newOpacity)
+      ..blendMode = BlendMode.modulate;
   }
 
   @override
   void renderTree(Canvas canvas) {
-    canvas.saveLayer(null, Paint()..blendMode = BlendMode.srcOver);
+    canvas.saveLayer(null, _srcOverPaint);
     super.renderTree(canvas);
-    canvas.drawPaint(_paint..blendMode = BlendMode.modulate);
+    canvas.drawPaint(_paint);
     canvas.restore();
   }
 }
