@@ -233,10 +233,12 @@ class Training999 extends FlameGame
 
   void gameover() {
     isGameOver = true;
+    overlays.add('rank');
     removeWhere((c) => c is TimerComponent);
   }
 
   void reset() {
+    overlays.remove('rank');
     removeWhere((c) =>
         c is Bullet ||
         c is TimerComponent ||
