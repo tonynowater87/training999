@@ -10,20 +10,17 @@ class RankingListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black.withOpacity(0.5),
-      body: Container(
-        width: double.infinity,
-        child: ListView.builder(
-          itemCount: 10,
-          itemBuilder: (context, index) {
-            return Container(
-              color: randomColor(),
-              child: ListTile(
-                title: Text('Rank ${index + 1}'),
-                subtitle: Text('Tony'),
-              ),
-            );
-          },
-        ),
+      body: ListView.builder(
+        itemCount: 10,
+        itemBuilder: (context, index) {
+          return Container(
+            color: randomColor(),
+            child: ListTile(
+              title: Text('Rank ${index + 1}'),
+              subtitle: Text('Tony'),
+            ),
+          );
+        },
       ),
     );
   }
