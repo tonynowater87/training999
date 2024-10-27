@@ -25,7 +25,6 @@ class Training999 extends FlameGame
         TapCallbacks,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
-
   static double _joystickControllerConstant = 0.75;
   static double _keyControllerConstant = 1.5;
 
@@ -117,7 +116,8 @@ class Training999 extends FlameGame
             add(InfoTextComponent('誘導彈發射!', Vector2(size.x / 2, 0)));
           }
           gameTime++;
-          debugPrint('[TONY] TimerComponent.onTick() called! gameTime: $gameTime');
+          debugPrint(
+              '[TONY] TimerComponent.onTick() called! gameTime: $gameTime');
         }));
   }
 
@@ -129,18 +129,18 @@ class Training999 extends FlameGame
   void addBullet(BulletLevel bulletLevel) {
     final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
     debugPrint('[TONY] addBullet() called! _rng: ${_rng.hashCode}');
-    add(TimerComponent(
-        period: bulletLevel.getPeriod(),
-        repeat: true,
-        removeOnFinish: true,
-        onTick: () {
+    add(SpawnComponent(
+      selfPositioning: true,
+        factory: (int amount) {
+          debugPrint('[TONY] SpawnComponent.factory() called! amount: $amount');
           var angle = _rng.nextDouble() * 360;
           var radians = angle * pi / 180;
           Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
                   gameSizeOfRadius * sin(radians))
               .translated(size.x / 2, size.y / 2);
-          add(Bullet(position, bulletLevel));
-        }));
+          return Bullet(position, bulletLevel);
+        },
+        period: bulletLevel.getPeriod()));
   }
 
   void addBrilliantlyDodgedTheBulletText() {
@@ -164,7 +164,8 @@ class Training999 extends FlameGame
   }
 
   @override
-  KeyEventResult onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
+  KeyEventResult onKeyEvent(
+      KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     super.onKeyEvent(event, keysPressed);
 
     if (isGameOver) {
@@ -175,11 +176,14 @@ class Training999 extends FlameGame
     for (final key in keysPressed) {
       if (key == LogicalKeyboardKey.arrowUp || key == LogicalKeyboardKey.keyW) {
         pressedKeySets.add(key);
-      } else if (key == LogicalKeyboardKey.arrowDown || key == LogicalKeyboardKey.keyS) {
+      } else if (key == LogicalKeyboardKey.arrowDown ||
+          key == LogicalKeyboardKey.keyS) {
         pressedKeySets.add(key);
-      } else if (key == LogicalKeyboardKey.arrowLeft || key == LogicalKeyboardKey.keyA) {
+      } else if (key == LogicalKeyboardKey.arrowLeft ||
+          key == LogicalKeyboardKey.keyA) {
         pressedKeySets.add(key);
-      } else if (key == LogicalKeyboardKey.arrowRight || key == LogicalKeyboardKey.keyD) {
+      } else if (key == LogicalKeyboardKey.arrowRight ||
+          key == LogicalKeyboardKey.keyD) {
         pressedKeySets.add(key);
       } else {
         return KeyEventResult.ignored;
@@ -236,6 +240,7 @@ class Training999 extends FlameGame
     overlays.add('rank');
     removeWhere((c) => c is JoystickComponent);
     removeWhere((c) => c is TimerComponent);
+    removeWhere((c) => c is SpawnComponent);
   }
 
   void reset() {
@@ -243,6 +248,7 @@ class Training999 extends FlameGame
     removeWhere((c) =>
         c is Bullet ||
         c is TimerComponent ||
+        c is SpawnComponent ||
         c is ExplosionComponent ||
         c is ScoreText);
     bulletCount = 0;
@@ -261,25 +267,29 @@ class Training999 extends FlameGame
         player.position += Vector2(-_joystickControllerConstant, 0);
         break;
       case JoystickDirection.upLeft:
-        player.position += Vector2(-_joystickControllerConstant, -_joystickControllerConstant);
+        player.position +=
+            Vector2(-_joystickControllerConstant, -_joystickControllerConstant);
         break;
       case JoystickDirection.up:
         player.position += Vector2(0, -_joystickControllerConstant);
         break;
       case JoystickDirection.upRight:
-        player.position += Vector2(_joystickControllerConstant, -_joystickControllerConstant);
+        player.position +=
+            Vector2(_joystickControllerConstant, -_joystickControllerConstant);
         break;
       case JoystickDirection.right:
         player.position += Vector2(_joystickControllerConstant, 0);
         break;
       case JoystickDirection.downRight:
-        player.position += Vector2(_joystickControllerConstant, _joystickControllerConstant);
+        player.position +=
+            Vector2(_joystickControllerConstant, _joystickControllerConstant);
         break;
       case JoystickDirection.down:
         player.position += Vector2(0, _joystickControllerConstant);
         break;
       case JoystickDirection.downLeft:
-        player.position += Vector2(-_joystickControllerConstant, _joystickControllerConstant);
+        player.position +=
+            Vector2(-_joystickControllerConstant, _joystickControllerConstant);
         break;
       default:
         player.position += Vector2(0, 0);
@@ -291,25 +301,29 @@ class Training999 extends FlameGame
         player.position += Vector2(-_joystickControllerConstant, 0);
         break;
       case JoystickDirection.upLeft:
-        player.position += Vector2(-_joystickControllerConstant, -_joystickControllerConstant);
+        player.position +=
+            Vector2(-_joystickControllerConstant, -_joystickControllerConstant);
         break;
       case JoystickDirection.up:
         player.position += Vector2(0, -_joystickControllerConstant);
         break;
       case JoystickDirection.upRight:
-        player.position += Vector2(_joystickControllerConstant, -_joystickControllerConstant);
+        player.position +=
+            Vector2(_joystickControllerConstant, -_joystickControllerConstant);
         break;
       case JoystickDirection.right:
         player.position += Vector2(_joystickControllerConstant, 0);
         break;
       case JoystickDirection.downRight:
-        player.position += Vector2(_joystickControllerConstant, _joystickControllerConstant);
+        player.position +=
+            Vector2(_joystickControllerConstant, _joystickControllerConstant);
         break;
       case JoystickDirection.down:
         player.position += Vector2(0, _joystickControllerConstant);
         break;
       case JoystickDirection.downLeft:
-        player.position += Vector2(-_joystickControllerConstant, _joystickControllerConstant);
+        player.position +=
+            Vector2(-_joystickControllerConstant, _joystickControllerConstant);
         break;
       default:
         player.position += Vector2(0, 0);
