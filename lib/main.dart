@@ -17,11 +17,7 @@ Future<void> main() async {
     },
     overlayBuilderMap: {
       'rank': (BuildContext context, Game game) {
-        return Container(
-          width: 200,
-          color: Colors.black.withOpacity(0.5),
-          child: RankingListWidget(),
-        );
+        return RankingListWidget();
       },
     },
   ));

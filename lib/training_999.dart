@@ -233,9 +233,8 @@ class Training999 extends FlameGame
 
   void gameover() {
     isGameOver = true;
-    Future.delayed(const Duration(seconds: 1), () {
-      overlays.add('rank');
-    });
+    overlays.add('rank');
+    removeWhere((c) => c is JoystickComponent);
     removeWhere((c) => c is TimerComponent);
   }
 
