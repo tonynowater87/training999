@@ -16,6 +16,8 @@ import 'package:training999/components/star_background_creator.dart';
 import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
+import 'package:training999/provider/rank.dart';
+import 'package:training999/provider/rank_repository.dart';
 import 'package:training999/util/bullet_level.dart';
 
 import 'components/detect_close_to_bullet.dart';
@@ -61,6 +63,7 @@ class Training999 extends FlameGame
 
   @override
   Future onLoad() async {
+    super.onLoad();
     // debugMode = kDebugMode;
 
     add(router = RouterComponent(initialRoute: "splash", routes: {
@@ -84,6 +87,7 @@ class Training999 extends FlameGame
 
   void start() {
     isGameOver = false;
+    overlays.clear();
     if (!contains(player)) {
       add(player);
       add(detectCloseToBullet);
@@ -132,7 +136,7 @@ class Training999 extends FlameGame
     final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
     debugPrint('[TONY] addBullet() called! _rng: ${_rng.hashCode}');
     add(SpawnComponent(
-      selfPositioning: true,
+        selfPositioning: true,
         factory: (int amount) {
           debugPrint('[TONY] SpawnComponent.factory() called! amount: $amount');
           var angle = _rng.nextDouble() * 360;
@@ -239,6 +243,13 @@ class Training999 extends FlameGame
 
   void gameover() {
     isGameOver = true;
+    var rankRepository = ref.read(rankRepositoryProvider);
+    rankRepository.insertRank(Rank(
+        id: DateTime.now().millisecondsSinceEpoch,
+        name: 'Test',
+        survivedTimeInMilliseconds: surviveTime,
+        brilliantlyDodgedTheBullets: brilliantlyDodgedTheBullet,
+        platform: 'Android'));
     overlays.add('rank');
     removeWhere((c) => c is JoystickComponent);
     removeWhere((c) => c is TimerComponent);

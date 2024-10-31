@@ -30,18 +30,28 @@ class MenuPage extends Component with HasGameReference<Training999> {
         },
         color: const Color(0xffadde6c),
         borderColor: const Color(0xffedffab),
+      ),
+      _button2 = RoundedButton(
+        text: '排行榜',
+        action: () {
+          game.overlays.add('rank');
+        },
+        color: const Color(0xffadde6c),
+        borderColor: const Color(0xffedffab),
       )
     ]);
   }
 
   late final TextComponent _logo;
   late final RoundedButton _button1;
+  late final RoundedButton _button2;
 
   @override
   void onGameResize(Vector2 size) {
     super.onGameResize(size);
     _logo.position = Vector2(size.x / 2, size.y / 3);
     _button1.position = Vector2(size.x / 2, _logo.y + 80);
+    _button2.position = Vector2(size.x / 2, _logo.y + 130);
   }
 
   @override
