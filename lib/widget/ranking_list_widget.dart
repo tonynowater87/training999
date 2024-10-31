@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:training999/provider/my_latest_rank_provider.dart';
 import 'package:training999/provider/rank_provider.dart';
+import 'package:training999/util/time_utils.dart';
 
 class RankingListWidget extends ConsumerWidget {
   final ScrollController _scrollController = ScrollController();
@@ -47,9 +48,9 @@ class RankingListWidget extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("存活時間 ${rank.survivedTimeInMilliseconds}",
+                    Text("存活時間 ${formatMilliseconds(rank.survivedTimeInMilliseconds)}",
                         style: TextStyle(color: Colors.white)),
-                    Text("絕妙度 ${rank.brilliantlyDodgedTheBullets}",
+                    Text("絕妙度 ${rank.brilliantlyDodgedTheBullets}%",
                         style: TextStyle(color: Colors.white)),
                   ],
                 ),
