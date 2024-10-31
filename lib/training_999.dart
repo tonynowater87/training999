@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
+import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide Route;
 import 'package:training999/components/airplane.dart';
@@ -21,6 +22,7 @@ import 'components/detect_close_to_bullet.dart';
 
 class Training999 extends FlameGame
     with
+        RiverpodGameMixin,
         DragCallbacks,
         TapCallbacks,
         HasCollisionDetection,

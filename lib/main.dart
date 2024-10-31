@@ -1,7 +1,8 @@
 import 'package:flame/flame.dart';
-import 'package:flame/game.dart';
+import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:training999/training_999.dart';
 import 'package:training999/widget/ranking_list_widget.dart';
 
@@ -11,14 +12,13 @@ Future<void> main() async {
   await Flame.device.setLandscape();
 
   var game = Training999();
-  runApp(GameWidget.controlled(
-    gameFactory: () {
-      return kDebugMode ? Training999() : game;
-    },
-    overlayBuilderMap: {
-      'rank': (BuildContext context, Game game) {
-        return RankingListWidget();
+  runApp(ProviderScope(
+    child: RiverpodAwareGameWidget<Training999>(
+      overlayBuilderMap: {
+        'rank': (context, game) => const RankingListWidget(),
       },
-    },
+      game: kDebugMode ? Training999() : game,
+      key: GlobalKey(),
+    ),
   ));
 }
