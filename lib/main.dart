@@ -17,7 +17,7 @@ Future<void> main() async {
     observers: [MyProviderObserver()],
     child: RiverpodAwareGameWidget<Training999>(
       overlayBuilderMap: {
-        'rank': (context, game) => const RankingListWidget(),
+        'rank': (context, game) => RankingListWidget(),
       },
       game: kDebugMode ? Training999() : game,
       key: GlobalKey(),

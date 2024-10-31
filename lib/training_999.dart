@@ -17,7 +17,7 @@ import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
 import 'package:training999/provider/rank.dart';
-import 'package:training999/provider/rank_repository.dart';
+import 'package:training999/provider/rank_repository_provider.dart';
 import 'package:training999/util/bullet_level.dart';
 
 import 'components/detect_close_to_bullet.dart';
@@ -138,7 +138,7 @@ class Training999 extends FlameGame
     add(SpawnComponent(
         selfPositioning: true,
         factory: (int amount) {
-          debugPrint('[TONY] SpawnComponent.factory() called! amount: $amount');
+          // debugPrint('[TONY] SpawnComponent.factory() called! amount: $amount');
           var angle = _rng.nextDouble() * 360;
           var radians = angle * pi / 180;
           Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
@@ -243,13 +243,13 @@ class Training999 extends FlameGame
 
   void gameover() {
     isGameOver = true;
-    var rankRepository = ref.read(rankRepositoryProvider);
-    rankRepository.insertRank(Rank(
+    ref.read(rankRepositoryProvider).insertRank(Rank(
         id: DateTime.now().millisecondsSinceEpoch,
         name: 'Test',
         survivedTimeInMilliseconds: surviveTime,
         brilliantlyDodgedTheBullets: brilliantlyDodgedTheBullet,
-        platform: 'Android'));
+        platform: 'Android',
+        createdAt: DateTime.now()));
     overlays.add('rank');
     removeWhere((c) => c is JoystickComponent);
     removeWhere((c) => c is TimerComponent);

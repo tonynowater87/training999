@@ -20,6 +20,7 @@ mixin _$Rank {
   String get name => throw _privateConstructorUsedError;
   int get survivedTimeInMilliseconds => throw _privateConstructorUsedError;
   int get brilliantlyDodgedTheBullets => throw _privateConstructorUsedError;
+  DateTime get createdAt => throw _privateConstructorUsedError;
   String get platform => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -36,6 +37,7 @@ abstract class $RankCopyWith<$Res> {
       String name,
       int survivedTimeInMilliseconds,
       int brilliantlyDodgedTheBullets,
+      DateTime createdAt,
       String platform});
 }
 
@@ -56,6 +58,7 @@ class _$RankCopyWithImpl<$Res, $Val extends Rank>
     Object? name = null,
     Object? survivedTimeInMilliseconds = null,
     Object? brilliantlyDodgedTheBullets = null,
+    Object? createdAt = null,
     Object? platform = null,
   }) {
     return _then(_value.copyWith(
@@ -75,6 +78,10 @@ class _$RankCopyWithImpl<$Res, $Val extends Rank>
           ? _value.brilliantlyDodgedTheBullets
           : brilliantlyDodgedTheBullets // ignore: cast_nullable_to_non_nullable
               as int,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       platform: null == platform
           ? _value.platform
           : platform // ignore: cast_nullable_to_non_nullable
@@ -95,6 +102,7 @@ abstract class _$$RankImplCopyWith<$Res> implements $RankCopyWith<$Res> {
       String name,
       int survivedTimeInMilliseconds,
       int brilliantlyDodgedTheBullets,
+      DateTime createdAt,
       String platform});
 }
 
@@ -112,6 +120,7 @@ class __$$RankImplCopyWithImpl<$Res>
     Object? name = null,
     Object? survivedTimeInMilliseconds = null,
     Object? brilliantlyDodgedTheBullets = null,
+    Object? createdAt = null,
     Object? platform = null,
   }) {
     return _then(_$RankImpl(
@@ -131,6 +140,10 @@ class __$$RankImplCopyWithImpl<$Res>
           ? _value.brilliantlyDodgedTheBullets
           : brilliantlyDodgedTheBullets // ignore: cast_nullable_to_non_nullable
               as int,
+      createdAt: null == createdAt
+          ? _value.createdAt
+          : createdAt // ignore: cast_nullable_to_non_nullable
+              as DateTime,
       platform: null == platform
           ? _value.platform
           : platform // ignore: cast_nullable_to_non_nullable
@@ -147,6 +160,7 @@ class _$RankImpl implements _Rank {
       required this.name,
       required this.survivedTimeInMilliseconds,
       required this.brilliantlyDodgedTheBullets,
+      required this.createdAt,
       required this.platform});
 
   @override
@@ -158,11 +172,13 @@ class _$RankImpl implements _Rank {
   @override
   final int brilliantlyDodgedTheBullets;
   @override
+  final DateTime createdAt;
+  @override
   final String platform;
 
   @override
   String toString() {
-    return 'Rank(id: $id, name: $name, survivedTimeInMilliseconds: $survivedTimeInMilliseconds, brilliantlyDodgedTheBullets: $brilliantlyDodgedTheBullets, platform: $platform)';
+    return 'Rank(id: $id, name: $name, survivedTimeInMilliseconds: $survivedTimeInMilliseconds, brilliantlyDodgedTheBullets: $brilliantlyDodgedTheBullets, createdAt: $createdAt, platform: $platform)';
   }
 
   @override
@@ -180,13 +196,21 @@ class _$RankImpl implements _Rank {
                     brilliantlyDodgedTheBullets) ||
                 other.brilliantlyDodgedTheBullets ==
                     brilliantlyDodgedTheBullets) &&
+            (identical(other.createdAt, createdAt) ||
+                other.createdAt == createdAt) &&
             (identical(other.platform, platform) ||
                 other.platform == platform));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, id, name,
-      survivedTimeInMilliseconds, brilliantlyDodgedTheBullets, platform);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      name,
+      survivedTimeInMilliseconds,
+      brilliantlyDodgedTheBullets,
+      createdAt,
+      platform);
 
   @JsonKey(ignore: true)
   @override
@@ -201,6 +225,7 @@ abstract class _Rank implements Rank {
       required final String name,
       required final int survivedTimeInMilliseconds,
       required final int brilliantlyDodgedTheBullets,
+      required final DateTime createdAt,
       required final String platform}) = _$RankImpl;
 
   @override
@@ -211,6 +236,8 @@ abstract class _Rank implements Rank {
   int get survivedTimeInMilliseconds;
   @override
   int get brilliantlyDodgedTheBullets;
+  @override
+  DateTime get createdAt;
   @override
   String get platform;
   @override

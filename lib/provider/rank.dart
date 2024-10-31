@@ -9,6 +9,7 @@ class Rank with _$Rank {
     required String name,
     required int survivedTimeInMilliseconds,
     required int brilliantlyDodgedTheBullets,
+    required DateTime createdAt,
     required String platform,
   }) = _Rank;
 }
