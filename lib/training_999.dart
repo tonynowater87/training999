@@ -13,6 +13,7 @@ import 'package:training999/components/explosion.dart';
 import 'package:training999/components/info_text.dart';
 import 'package:training999/components/score_text.dart';
 import 'package:training999/components/star_background_creator.dart';
+import 'package:training999/constant.dart';
 import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
@@ -29,8 +30,9 @@ class Training999 extends FlameGame
         TapCallbacks,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
-  static double _joystickControllerConstant = 0.75;
-  static double _keyControllerConstant = 1.5;
+  static const double _joystickControllerConstant = 1.5;
+  static const double _keyControllerConstant = 1.5;
+  double _timeElapsed = 0;
 
   late Airplane player;
   late DetectCloseToBullet detectCloseToBullet;
@@ -155,9 +157,19 @@ class Training999 extends FlameGame
   }
 
   @override
+  void updateTree(double dt) {
+    _timeElapsed += dt;
+    // // make sure we update at most 60fps
+    if (_timeElapsed > timePerFrame) {
+      _timeElapsed -= timePerFrame;
+      updateJoystick();
+      updateKeys();
+      super.updateTree(timePerFrame);
+    }
+  }
+
+  @override
   void update(double dt) {
-    updateJoystick();
-    updateKeys();
     if (!isGameOver) {
       var dateTime = DateTime.now();
       if (lastTime == 0) {

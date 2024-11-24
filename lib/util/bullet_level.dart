@@ -29,11 +29,11 @@ extension BulletLevelExtension on BulletLevel {
   Vector2 getVelocity(Vector2 direction) {
     switch (this) {
       case BulletLevel.easy:
-        return Vector2(direction.x * 50, direction.y * 50);
+        return Vector2(direction.x * 100, direction.y * 100);
       case BulletLevel.middle:
-        return Vector2(direction.x * 150, direction.y * 100);
+        return Vector2(direction.x * 250, direction.y * 200);
       case BulletLevel.hard:
-        return Vector2(direction.x * 300, direction.y * 200);
+        return Vector2(direction.x * 450, direction.y * 400);
     }
   }
 
