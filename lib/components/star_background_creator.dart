@@ -36,9 +36,10 @@ class StarBackGroundCreator extends Component with HasGameRef {
   void _createStarAt(double x, double y) {
     final animation = spriteSheet.createAnimation(
       row: random.nextInt(3),
-      to: 4,
+      to: 1,
       stepTime: 0.1,
-    )..variableStepTimes = [max(20, 100 * random.nextDouble()), 0.1, 0.1, 0.1];
+    )..variableStepTimes = [max(20, 100 * random.nextDouble())];
+    //
 
     game.add(StarComponent(animation: animation, position: Vector2(x, y)));
   }
