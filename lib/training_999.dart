@@ -281,6 +281,8 @@ class Training999 extends FlameGame
     overlays.remove('rank');
     removeWhere((c) =>
         c is BulletEasy ||
+        c is BulletMid ||
+        c is BulletHard ||
         c is TimerComponent ||
         c is SpawnComponent ||
         c is ExplosionComponent ||
@@ -367,7 +369,9 @@ class Training999 extends FlameGame
   }
 
   void calcBulletCount() {
-    bulletCount = children.whereType<BulletEasy>().length;
+    bulletCount = children.whereType<BulletEasy>().length +
+        children.whereType<BulletMid>().length +
+        children.whereType<BulletHard>().length;
   }
 
   void updateKeys() {
