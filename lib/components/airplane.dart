@@ -1,10 +1,12 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:training999/components/bullet_hard.dart';
+import 'package:training999/components/bullet_mid.dart';
 import 'package:training999/components/explosion.dart';
 import 'package:training999/training_999.dart';
 
-import 'bullet.dart';
+import 'bullet_easy.dart';
 
 class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, CollisionCallbacks {
   Airplane() : super(size: Vector2(32, 39), anchor: Anchor.center, priority: 100);
@@ -53,7 +55,7 @@ class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, Co
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
-    if (other is Bullet) {
+    if (other is BulletEasy || other is BulletMid || other is BulletHard) {
       game.calcBulletCount();
       explode();
       gameRef.gameover();

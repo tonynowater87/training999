@@ -1,9 +1,11 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:training999/components/bullet_hard.dart';
+import 'package:training999/components/bullet_mid.dart';
 import 'package:training999/training_999.dart';
 
-import 'bullet.dart';
+import 'bullet_easy.dart';
 
 class DetectCloseToBullet extends PositionComponent
     with HasGameRef<Training999>, CollisionCallbacks {
@@ -45,7 +47,7 @@ class DetectCloseToBullet extends PositionComponent
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
-    if (other is Bullet) {
+    if (other is BulletEasy || other is BulletMid || other is BulletHard) {
       debugPrint('[TONY] 絕妙度過子彈!!!！');
       Future.delayed(const Duration(milliseconds: 50), () {
         if (gameRef.isGameOver) {

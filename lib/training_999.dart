@@ -8,7 +8,9 @@ import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide Route;
 import 'package:training999/components/airplane.dart';
-import 'package:training999/components/bullet.dart';
+import 'package:training999/components/bullet_easy.dart';
+import 'package:training999/components/bullet_hard.dart';
+import 'package:training999/components/bullet_mid.dart';
 import 'package:training999/components/explosion.dart';
 import 'package:training999/components/info_text.dart';
 import 'package:training999/components/score_text.dart';
@@ -146,7 +148,14 @@ class Training999 extends FlameGame
           Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
                   gameSizeOfRadius * sin(radians))
               .translated(size.x / 2, size.y / 2);
-          return Bullet(position, bulletLevel);
+          switch (bulletLevel) {
+            case BulletLevel.easy:
+              return BulletEasy(position);
+            case BulletLevel.middle:
+              return BulletMid(position);
+            case BulletLevel.hard:
+              return BulletHard(position);
+          }
         },
         period: bulletLevel.getPeriod()));
   }
@@ -271,7 +280,7 @@ class Training999 extends FlameGame
   void reset() {
     overlays.remove('rank');
     removeWhere((c) =>
-        c is Bullet ||
+        c is BulletEasy ||
         c is TimerComponent ||
         c is SpawnComponent ||
         c is ExplosionComponent ||
@@ -358,7 +367,7 @@ class Training999 extends FlameGame
   }
 
   void calcBulletCount() {
-    bulletCount = children.whereType<Bullet>().length;
+    bulletCount = children.whereType<BulletEasy>().length;
   }
 
   void updateKeys() {
