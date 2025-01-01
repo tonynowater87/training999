@@ -87,6 +87,8 @@ class Training999 extends FlameGame
     add(StarBackGroundCreator());
     initJoystick();
     pressedKeySets = {};
+
+    overlays.add("enter_name");
   }
 
   void start() {

@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:training999/firebase_options.dart';
 import 'package:training999/training_999.dart';
 import 'package:training999/util/my_provider_observer.dart';
+import 'package:training999/widget/enter_name_widget.dart';
 import 'package:training999/widget/ranking_list_widget.dart';
 
 Future<void> main() async {
@@ -20,12 +21,17 @@ Future<void> main() async {
   var game = Training999();
   runApp(ProviderScope(
     observers: [MyProviderObserver()],
-    child: RiverpodAwareGameWidget<Training999>(
-      overlayBuilderMap: {
-        'rank': (context, game) => RankingListWidget(),
-      },
-      game: kDebugMode ? Training999() : game,
-      key: GlobalKey(),
+    child: MaterialApp(
+      home: Scaffold(
+        body: RiverpodAwareGameWidget<Training999>(
+          overlayBuilderMap: {
+            'enter_name': (context, game) => EnterNameWidget(),
+            'rank': (context, game) => RankingListWidget(),
+          },
+          game: kDebugMode ? Training999() : game,
+          key: GlobalKey(),
+        ),
+      ),
     ),
   ));
 }

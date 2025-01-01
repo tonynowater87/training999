@@ -20,44 +20,41 @@ class RankingListWidget extends ConsumerWidget {
 
     scrollTo(latestRankIndex + 1, screenHeight);
 
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        padding: const EdgeInsets.all(10),
-        width: MediaQuery.of(context).size.width / 3,
-        height: screenHeight,
-        color: Colors.black.withOpacity(0.5),
-        child: ListView.builder(
-          controller: _scrollController,
-          itemCount: rankList.length,
-          itemBuilder: (context, index) {
-            final rank = rankList[index];
-            return Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                    color: latestRankIndex == index
-                        ? Colors.white
-                        : Colors.transparent),
+    return Container(
+      padding: const EdgeInsets.all(10),
+      width: MediaQuery.of(context).size.width / 3,
+      height: screenHeight,
+      color: Colors.black.withOpacity(0.5),
+      child: ListView.builder(
+        controller: _scrollController,
+        itemCount: rankList.length,
+        itemBuilder: (context, index) {
+          final rank = rankList[index];
+          return Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                  color: latestRankIndex == index
+                      ? Colors.white
+                      : Colors.transparent),
+            ),
+            child: ListTile(
+              title: Text('排名 ${index + 1}',
+                  style: TextStyle(color: Colors.white)),
+              subtitle:
+                  Text(rank.name, style: TextStyle(color: Colors.white)),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("存活時間 ${formatMilliseconds(rank.survivedTimeInMilliseconds)}",
+                      style: TextStyle(color: Colors.white)),
+                  Text("絕妙度 ${rank.brilliantlyDodgedTheBullets}%",
+                      style: TextStyle(color: Colors.white)),
+                ],
               ),
-              child: ListTile(
-                title: Text('排名 ${index + 1}',
-                    style: TextStyle(color: Colors.white)),
-                subtitle:
-                    Text(rank.name, style: TextStyle(color: Colors.white)),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("存活時間 ${formatMilliseconds(rank.survivedTimeInMilliseconds)}",
-                        style: TextStyle(color: Colors.white)),
-                    Text("絕妙度 ${rank.brilliantlyDodgedTheBullets}%",
-                        style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }
