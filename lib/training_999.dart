@@ -42,7 +42,7 @@ class Training999 extends FlameGame
   late JoystickComponent joystickRight;
   late double gameSizeOfRadius;
   int bulletCount = 0;
-  bool isGameOver = false;
+  bool isGameOver = true;
   int gameTime = 0;
   int lastTime = 0;
   int surviveTime = 0;
