@@ -19,6 +19,8 @@ import 'package:training999/constant.dart';
 import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
+import 'package:training999/provider/name/name_provider.dart';
+import 'package:training999/provider/name/name_repository_provider.dart';
 import 'package:training999/provider/rank.dart';
 import 'package:training999/provider/rank_repository_provider.dart';
 import 'package:training999/util/bullet_level.dart';
@@ -89,6 +91,21 @@ class Training999 extends FlameGame
     pressedKeySets = {};
 
     overlays.add("enter_name");
+  }
+
+  @override
+  void onMount() {
+    addToGameWidgetBuild(() {
+      debugPrint('[TONY] listen() called!');
+      ref.listen(nameProvider, (previous, current) {
+        debugPrint(
+            '[TONY] nameProvider.listen() called!, previous:$previous,  current: $current');
+      }, onError: (error, stackTrace) {
+        debugPrint(
+            '[TONY] nameProvider.listen() called! error: $error, stackTrace: $stackTrace');
+      });
+    });
+    super.onMount();
   }
 
   void start() {

@@ -5,7 +5,7 @@ class MyProviderObserver extends ProviderObserver {
   void didAddProvider(
       ProviderBase provider, Object? value, ProviderContainer container) {
     super.didAddProvider(provider, value, container);
-    print('Provider added: ${provider.name ?? provider.runtimeType}');
+    print('[TONY] Provider added: ${provider.name ?? provider.runtimeType}');
   }
 
   @override
@@ -13,12 +13,12 @@ class MyProviderObserver extends ProviderObserver {
       Object? newValue, ProviderContainer container) {
     super.didUpdateProvider(provider, previousValue, newValue, container);
     print(
-        'Provider updated: ${provider.name ?? provider.runtimeType}, new value: $newValue');
+        '[TONY] Provider updated: ${provider.name ?? provider.runtimeType}, new value: $newValue');
   }
 
   @override
   void didDisposeProvider(ProviderBase provider, ProviderContainer container) {
     super.didDisposeProvider(provider, container);
-    print('Provider disposed: ${provider.name ?? provider.runtimeType}');
+    print('[TONY] Provider disposed: ${provider.name ?? provider.runtimeType}');
   }
 }
