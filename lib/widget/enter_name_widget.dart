@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:training999/provider/name/name_repository_provider.dart';
+import 'package:training999/provider/name/user_name.dart';
 
 class EnterNameWidget extends ConsumerWidget {
   const EnterNameWidget({super.key});
@@ -29,7 +30,7 @@ class EnterNameWidget extends ConsumerWidget {
                 style: TextStyle(color: Colors.white),
                 onSubmitted: (String? value) async {
                   if (value != null && value.isNotEmpty) {
-                    ref.read(nameRepositoryDebugProvider.notifier).setName(value);
+                    ref.read(nameRepositoryProvider).setName(UserName(name: value));
                   }
                 },
               ),

@@ -97,7 +97,7 @@ class Training999 extends FlameGame
   void onMount() {
     addToGameWidgetBuild(() {
       debugPrint('[TONY] listen() called!');
-      ref.listen(nameProvider, (previous, current) {
+      ref.listen(userNameProvider, (previous, current) {
         debugPrint(
             '[TONY] nameProvider.listen() called!, previous:$previous,  current: $current');
       }, onError: (error, stackTrace) {

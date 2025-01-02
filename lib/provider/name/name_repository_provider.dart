@@ -1,19 +1,20 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:training999/provider/name/name_repository.dart';
+import 'package:training999/provider/name/user_name.dart';
 
 part 'name_repository_provider.g.dart';
 
+class NameRepository {
+  final List<UserName> _names = [];
+
+  List<UserName> get names => _names;
+
+  setName(UserName userName) {
+    _names.add(userName);
+  }
+}
+
 @Riverpod(keepAlive: true)
-class NameRepositoryDebug extends _$NameRepositoryDebug {
-  final NameRepository _nameRepository = NameRepository();
-
-  @override
-  Future<String?> build() async {
-    return _nameRepository.getNameByAdvertisingIdentifier;
-  }
-
-  void setName(String name) {
-    _nameRepository.setName(name); // TODO
-    state = AsyncData(name);
-  }
+NameRepository nameRepository(Ref ref) {
+  return NameRepository();
 }
