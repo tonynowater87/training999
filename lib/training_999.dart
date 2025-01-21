@@ -21,8 +21,8 @@ import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
 import 'package:training999/provider/name/name_provider.dart';
 import 'package:training999/provider/name/name_repository_provider.dart';
-import 'package:training999/provider/rank.dart';
-import 'package:training999/provider/rank_repository_provider.dart';
+import 'package:training999/provider/rank/model/rank.dart';
+import 'package:training999/provider/rank/all_rank_provider.dart';
 import 'package:training999/util/bullet_level.dart';
 
 import 'components/detect_close_to_bullet.dart';
@@ -83,7 +83,6 @@ class Training999 extends FlameGame
             pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
             0.5) /
         2.0;
-    debugPrint('[TONY] game.size: $size, gameSizeOfRadius: $gameSizeOfRadius');
     player = Airplane();
     detectCloseToBullet = DetectCloseToBullet();
     add(StarBackGroundCreator());
@@ -95,14 +94,13 @@ class Training999 extends FlameGame
 
   @override
   void onMount() {
+    ref.read(allRankProvider); // 提前觸發 allRankProvider 的 build
     addToGameWidgetBuild(() {
-      debugPrint('[TONY] listen() called!');
+      debugPrint('[TONY] onGameWidgetBuild() called!');
       ref.listen(userNameProvider, (previous, current) {
-        debugPrint(
-            '[TONY] nameProvider.listen() called!, previous:$previous,  current: $current');
+
       }, onError: (error, stackTrace) {
-        debugPrint(
-            '[TONY] nameProvider.listen() called! error: $error, stackTrace: $stackTrace');
+
       });
     });
     super.onMount();
@@ -145,8 +143,6 @@ class Training999 extends FlameGame
             add(InfoTextComponent('誘導彈發射!', Vector2(size.x / 2, 0)));
           }
           gameTime++;
-          debugPrint(
-              '[TONY] TimerComponent.onTick() called! gameTime: $gameTime');
         }));
   }
 
@@ -157,11 +153,9 @@ class Training999 extends FlameGame
 
   void addBullet(BulletLevel bulletLevel) {
     final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
-    debugPrint('[TONY] addBullet() called! _rng: ${_rng.hashCode}');
     add(SpawnComponent(
         selfPositioning: true,
         factory: (int amount) {
-          // debugPrint('[TONY] SpawnComponent.factory() called! amount: $amount');
           var angle = _rng.nextDouble() * 360;
           var radians = angle * pi / 180;
           Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
@@ -283,9 +277,9 @@ class Training999 extends FlameGame
 
   void gameover() {
     isGameOver = true;
-    ref.read(rankRepositoryProvider).insertRank(Rank(
+    ref.read(allRankProvider.notifier).insertRecord(Rank(
         id: DateTime.now().millisecondsSinceEpoch,
-        name: 'Test',
+        name: 'Tony',
         survivedTimeInMilliseconds: surviveTime,
         brilliantlyDodgedTheBullets: brilliantlyDodgedTheBullet,
         platform: 'Android',

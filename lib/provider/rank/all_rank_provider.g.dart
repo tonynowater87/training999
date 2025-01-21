@@ -1,24 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'rank_provider.dart';
+part of 'all_rank_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$rankListHash() => r'd781ebce94344c23e7f485a19a81546a88911799';
+String _$allRankHash() => r'663d7b281cce8637d44d9cc09e77da7a14b238c8';
 
-/// See also [rankList].
-@ProviderFor(rankList)
-final rankListProvider = AutoDisposeProvider<List<Rank>>.internal(
-  rankList,
-  name: r'rankListProvider',
+/// See also [AllRank].
+@ProviderFor(AllRank)
+final allRankProvider = AsyncNotifierProvider<AllRank, List<Rank>>.internal(
+  AllRank.new,
+  name: r'allRankProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$rankListHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$allRankHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef RankListRef = AutoDisposeProviderRef<List<Rank>>;
+typedef _$AllRank = AsyncNotifier<List<Rank>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
