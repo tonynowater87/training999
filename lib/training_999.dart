@@ -19,8 +19,7 @@ import 'package:training999/constant.dart';
 import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
-import 'package:training999/provider/name/name_provider.dart';
-import 'package:training999/provider/name/name_repository_provider.dart';
+import 'package:training999/provider/name/my_name_provider.dart';
 import 'package:training999/provider/rank/model/rank.dart';
 import 'package:training999/provider/rank/all_rank_provider.dart';
 import 'package:training999/util/bullet_level.dart';
@@ -97,7 +96,7 @@ class Training999 extends FlameGame
     ref.read(allRankProvider); // 提前觸發 allRankProvider 的 build
     addToGameWidgetBuild(() {
       debugPrint('[TONY] onGameWidgetBuild() called!');
-      ref.listen(userNameProvider, (previous, current) {
+      ref.listen(myNameProvider, (previous, current) {
 
       }, onError: (error, stackTrace) {
 

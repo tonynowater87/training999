@@ -8,7 +8,7 @@ class AllRank extends _$AllRank {
   @override
   Future<List<Rank>> build() async {
     // TODO listen from firestore
-    return await generateRandomRankList();
+    return generateRandomRankList();
   }
 
   void insertRecord(Rank rank) {

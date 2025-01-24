@@ -16,6 +16,7 @@ final _privateConstructorUsedError = UnsupportedError(
 
 /// @nodoc
 mixin _$UserName {
+  String get uuid => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -28,7 +29,7 @@ abstract class $UserNameCopyWith<$Res> {
   factory $UserNameCopyWith(UserName value, $Res Function(UserName) then) =
       _$UserNameCopyWithImpl<$Res, UserName>;
   @useResult
-  $Res call({String name});
+  $Res call({String uuid, String name});
 }
 
 /// @nodoc
@@ -44,9 +45,14 @@ class _$UserNameCopyWithImpl<$Res, $Val extends UserName>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? uuid = null,
     Object? name = null,
   }) {
     return _then(_value.copyWith(
+      uuid: null == uuid
+          ? _value.uuid
+          : uuid // ignore: cast_nullable_to_non_nullable
+              as String,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -63,7 +69,7 @@ abstract class _$$UserNameImplCopyWith<$Res>
       __$$UserNameImplCopyWithImpl<$Res>;
   @override
   @useResult
-  $Res call({String name});
+  $Res call({String uuid, String name});
 }
 
 /// @nodoc
@@ -77,9 +83,14 @@ class __$$UserNameImplCopyWithImpl<$Res>
   @pragma('vm:prefer-inline')
   @override
   $Res call({
+    Object? uuid = null,
     Object? name = null,
   }) {
     return _then(_$UserNameImpl(
+      uuid: null == uuid
+          ? _value.uuid
+          : uuid // ignore: cast_nullable_to_non_nullable
+              as String,
       name: null == name
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
@@ -91,14 +102,16 @@ class __$$UserNameImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$UserNameImpl implements _UserName {
-  const _$UserNameImpl({required this.name});
+  const _$UserNameImpl({required this.uuid, required this.name});
 
+  @override
+  final String uuid;
   @override
   final String name;
 
   @override
   String toString() {
-    return 'UserName(name: $name)';
+    return 'UserName(uuid: $uuid, name: $name)';
   }
 
   @override
@@ -106,11 +119,12 @@ class _$UserNameImpl implements _UserName {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$UserNameImpl &&
+            (identical(other.uuid, uuid) || other.uuid == uuid) &&
             (identical(other.name, name) || other.name == name));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, name);
+  int get hashCode => Object.hash(runtimeType, uuid, name);
 
   @JsonKey(ignore: true)
   @override
@@ -120,8 +134,12 @@ class _$UserNameImpl implements _UserName {
 }
 
 abstract class _UserName implements UserName {
-  const factory _UserName({required final String name}) = _$UserNameImpl;
+  const factory _UserName(
+      {required final String uuid,
+      required final String name}) = _$UserNameImpl;
 
+  @override
+  String get uuid;
   @override
   String get name;
   @override

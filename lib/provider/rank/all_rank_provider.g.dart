@@ -6,7 +6,7 @@ part of 'all_rank_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allRankHash() => r'663d7b281cce8637d44d9cc09e77da7a14b238c8';
+String _$allRankHash() => r'13f9ab9161c6eee0da5021716792f7dd77bbd693';
 
 /// See also [AllRank].
 @ProviderFor(AllRank)
