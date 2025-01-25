@@ -23,7 +23,7 @@ class AllNameProvider extends _$AllNameProvider {
 
   Future<List<UserName>> generateRandomNameList() async {
     // TODO listen from firestore
-    return Future.delayed(const Duration(seconds: 5), () {
+    return Future.delayed(const Duration(seconds: 1), () {
       final List<UserName> nameList = [];
       for (int i = 0; i < 10; i++) {
         nameList.add(UserName(uuid: i.toString(), name: 'Player $i'));

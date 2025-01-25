@@ -50,6 +50,7 @@ class Training999 extends FlameGame
   int brilliantlyDodgedTheBullet = 0;
   late final RouterComponent router;
   late Set<LogicalKeyboardKey> pressedKeySets;
+  late String myName;
 
   Training999() : super();
 
@@ -97,7 +98,10 @@ class Training999 extends FlameGame
     addToGameWidgetBuild(() {
       debugPrint('[TONY] onGameWidgetBuild() called!');
       ref.listen(myNameProvider, (previous, current) {
-
+        if (current.hasValue && current.value!.name.isNotEmpty) {
+          myName = current.value!.name;
+          overlays.remove("enter_name");
+        }
       }, onError: (error, stackTrace) {
 
       });
@@ -278,7 +282,7 @@ class Training999 extends FlameGame
     isGameOver = true;
     ref.read(allRankProvider.notifier).insertRecord(Rank(
         id: DateTime.now().millisecondsSinceEpoch,
-        name: 'Tony',
+        name: myName,
         survivedTimeInMilliseconds: surviveTime,
         brilliantlyDodgedTheBullets: brilliantlyDodgedTheBullet,
         platform: 'Android',

@@ -1,24 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'my_rank_provider.dart';
+part of 'text_changed_provider.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$myRankHash() => r'58023c8bb233377de47743e8f0aacae41f45bacb';
+String _$textChangedHash() => r'167e70be0cb4beb3011483dacb4da673d57d83e4';
 
-/// See also [MyRank].
-@ProviderFor(MyRank)
-final myRankProvider = AsyncNotifierProvider<MyRank, List<Rank>>.internal(
-  MyRank.new,
-  name: r'myRankProvider',
+/// See also [TextChanged].
+@ProviderFor(TextChanged)
+final textChangedProvider = NotifierProvider<TextChanged, String>.internal(
+  TextChanged.new,
+  name: r'textChangedProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$myRankHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$textChangedHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$MyRank = AsyncNotifier<List<Rank>>;
+typedef _$TextChanged = Notifier<String>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

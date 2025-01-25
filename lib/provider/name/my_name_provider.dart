@@ -5,7 +5,7 @@ import 'package:training999/provider/name/model/user_name.dart';
 
 part 'my_name_provider.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<UserName> myName(Ref ref) async {
   List<UserName> allNames = await ref.watch(allNameProviderProvider.future);
   const uuid = '100'; // TODO get uuid from something
