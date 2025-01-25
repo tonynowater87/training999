@@ -1,45 +1,74 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
-import 'package:flutter/foundation.dart';
+import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/painting.dart';
 import 'package:training999/components/rounded_button.dart';
+import 'package:training999/provider/name/my_name_provider.dart';
 import 'package:training999/training_999.dart';
 
-class MenuPage extends Component with HasGameReference<Training999> {
+class MenuPage extends Component
+    with HasGameReference<Training999>, RiverpodComponentMixin {
+  bool isNameExisted = false;
+
+  @override
+  void onMount() {
+    addToGameWidgetBuild(() {
+      ref.listen(myNameProvider, (previous, myName) {
+        if (myName.hasValue) {
+          isNameExisted = myName.value!.name.isNotEmpty;
+          if (isNameExisted && !contains(_button1)) {
+            add(_button1);
+          }
+          if (isNameExisted && !contains(_button2)) {
+            add(_button2);
+          }
+        }
+      });
+    });
+    super.onMount();
+  }
+
   @override
   Future<void> onLoad() async {
-    debugPrint('[TONY] MenuPage.onLoad()');
-    addAll([
-      _logo = TextComponent(
-        text: '特訓999',
-        textRenderer: TextPaint(
-          style: const TextStyle(
-            fontSize: 64,
-            color: Color(0xFFC8FFF5),
-            fontWeight: FontWeight.w800,
-          ),
+    _logo = TextComponent(
+      text: '特訓999',
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontSize: 64,
+          color: Color(0xFFC8FFF5),
+          fontWeight: FontWeight.w800,
         ),
-        anchor: Anchor.center,
       ),
-      _button1 = RoundedButton(
-        text: '開始遊戲',
-        action: () {
-          game.router.pop();
-          game.start();
-        },
-        color: const Color(0xffadde6c),
-        borderColor: const Color(0xffedffab),
-      ),
-      _button2 = RoundedButton(
-        text: '排行榜',
-        action: () {
-          game.overlays.add('rank');
-        },
-        color: const Color(0xffadde6c),
-        borderColor: const Color(0xffedffab),
-      )
-    ]);
+      anchor: Anchor.center,
+    );
+    _button1 = RoundedButton(
+      text: '開始遊戲',
+      action: () {
+        game.router.pop();
+        game.start();
+      },
+      color: const Color(0xffadde6c),
+      borderColor: const Color(0xffedffab),
+    );
+    _button2 = RoundedButton(
+      text: '排行榜',
+      action: () {
+        game.overlays.add('rank');
+      },
+      color: const Color(0xffadde6c),
+      borderColor: const Color(0xffedffab),
+    );
+
+    if (isNameExisted) {
+      addAll([
+        _logo,
+        _button1,
+        _button2,
+      ]);
+    } else {
+      addAll([_logo]);
+    }
   }
 
   late final TextComponent _logo;
@@ -56,4 +85,9 @@ class MenuPage extends Component with HasGameReference<Training999> {
 
   @override
   bool containsPoint(Vector2 point) => true;
+
+  @override
+  void onRemove() {
+    super.onRemove();
+  }
 }
