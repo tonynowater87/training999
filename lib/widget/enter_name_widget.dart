@@ -47,7 +47,7 @@ class EnterNameWidget extends HookConsumerWidget {
                   if (value != null && value.isNotEmpty) {
                     ref
                         .read(allNameProviderProvider.notifier)
-                        .addName(UserName(name: value, uuid: '100'));
+                        .addName(value);
                   }
                 },
                 onChanged: (String value) {

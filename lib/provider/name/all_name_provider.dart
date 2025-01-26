@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:training999/provider/name/model/user_name.dart';
+import 'package:training999/provider/uuid/get_uuid.dart';
 
 part 'all_name_provider.g.dart';
 
@@ -11,12 +12,13 @@ class AllNameProvider extends _$AllNameProvider {
     return generateRandomNameList();
   }
 
-  void addName(UserName userName) {
+  Future<void> addName(String userName) async {
     // TODO insert record to firestore
     // check if name is already exist
     List<UserName> allNames = state.value!.toList();
-    if (!allNames.contains(userName)) {
-      allNames.add(userName);
+    if (allNames.where((element) => element.name == userName).isEmpty) {
+      final uuid = await ref.read(getUuidProvider.future);
+      allNames.add(UserName(uuid: uuid, name: userName));
       state = AsyncData(allNames);
     }
   }
