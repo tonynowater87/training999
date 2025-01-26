@@ -6,7 +6,7 @@ part of 'my_rank_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$myRankHash() => r'58023c8bb233377de47743e8f0aacae41f45bacb';
+String _$myRankHash() => r'cf49a2ef3520d72bdf5613d2003c294e24e8162f';
 
 /// See also [MyRank].
 @ProviderFor(MyRank)
