@@ -23,10 +23,8 @@ Future<String> getUuid(Ref ref) async {
   if (deviceId == null) {
     // 如果不存在，則生成一個新的 UUID
     deviceId = const Uuid().v4();
-    debugPrint('[TONY] generate new deviceId: $deviceId');
     await secureStorage.write(key: 'device_id', value: deviceId);
   }
 
-  debugPrint('[TONY] deviceId: $deviceId');
   return deviceId;
 }

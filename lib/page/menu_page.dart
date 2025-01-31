@@ -2,6 +2,7 @@ import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
 import 'package:flame_riverpod/flame_riverpod.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/painting.dart';
 import 'package:training999/components/rounded_button.dart';
 import 'package:training999/provider/name/my_name_provider.dart';
@@ -15,6 +16,7 @@ class MenuPage extends Component
   void onMount() {
     addToGameWidgetBuild(() {
       ref.listen(myNameProvider, (previous, myName) {
+        debugPrint('[TONY] MenuPage, myName: $myName');
         if (myName.hasValue) {
           isNameExisted = myName.value!.name.isNotEmpty;
           if (isNameExisted && !contains(_button1)) {
@@ -22,6 +24,9 @@ class MenuPage extends Component
           }
           if (isNameExisted && !contains(_button2)) {
             add(_button2);
+          }
+          if (!isNameExisted && !game.overlays.isActive('enter_name')) {
+            game.overlays.add('enter_name');
           }
         }
       });

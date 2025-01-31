@@ -90,15 +90,13 @@ class Training999 extends FlameGame
     add(StarBackGroundCreator());
     initJoystick();
     pressedKeySets = {};
-
-    overlays.add("enter_name");
   }
 
   @override
   void onMount() {
     ref.read(allRankProvider); // 提前觸發 allRankProvider 的 build
     addToGameWidgetBuild(() {
-      debugPrint('[TONY] onGameWidgetBuild() called!');
+      // 在這裡才能操作riverpod
       ref.listen(myNameProvider, (previous, current) {
         if (current.hasValue && current.value!.name.isNotEmpty) {
           myName = current.value!.name;
