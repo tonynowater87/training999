@@ -39,7 +39,6 @@ class EnterNameWidget extends HookConsumerWidget {
                 ),
                 style: const TextStyle(color: Colors.white),
                 onSubmitted: (String? value) async {
-                  debugPrint('[TONY] onFieldSubmitted: $value');
                   if (isNameExisted.value) {
                     return;
                   }

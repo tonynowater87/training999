@@ -20,7 +20,6 @@ class RankingListWidget extends ConsumerWidget {
           int latestRankIndex =
               rankList.indexWhere((element) => element.id == myLatestRank?.id);
 
-          debugPrint('[TONY] My latest rank: $myLatestRank, index: $latestRankIndex');
           scrollTo(latestRankIndex, screenHeight);
           return Container(
             padding: const EdgeInsets.all(10),

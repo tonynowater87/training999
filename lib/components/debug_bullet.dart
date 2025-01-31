@@ -18,20 +18,14 @@ class DebugBullet extends CircleComponent with HasGameRef {
 
   @override
   void onMount() {
-    final hash = hashCode;
-    debugPrint('[TONY] $hash DebugBullet onMount: $position');
     Future.delayed(Duration(seconds: delayTimeInSecond), () {
       if (position.x > game.canvasSize.x / 2 && position.y < game.canvasSize.y / 2) {
-        debugPrint('[TONY] 第一象限 $hash (${position.x}, ${position.y})');
         direction = Vector2(-1, 1) * 50;
       } else if (position.x < game.canvasSize.x / 2 && position.y < game.canvasSize.y / 2) {
-        debugPrint('[TONY] 第二象限 $hash (${position.x}, ${position.y})');
         direction = Vector2(1, 1) * 50;
       } else if (position.x < game.canvasSize.x / 2 && position.y > game.canvasSize.y / 2) {
-        debugPrint('[TONY] 第三象限 $hash (${position.x}, ${position.y})');
         direction = Vector2(1, -1) * 50;
       } else {
-        debugPrint('[TONY] 第四象限 $hash (${position.x}, ${position.y})');
         direction = Vector2(-1, -1) * 50;
       }
     });
