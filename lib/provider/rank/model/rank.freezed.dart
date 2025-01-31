@@ -20,7 +20,7 @@ mixin _$Rank {
   String get name => throw _privateConstructorUsedError;
   int get survivedTimeInMilliseconds => throw _privateConstructorUsedError;
   int get brilliantlyDodgedTheBullets => throw _privateConstructorUsedError;
-  DateTime get createdAt => throw _privateConstructorUsedError;
+  Timestamp get createdAt => throw _privateConstructorUsedError;
   String get platform => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
@@ -37,7 +37,7 @@ abstract class $RankCopyWith<$Res> {
       String name,
       int survivedTimeInMilliseconds,
       int brilliantlyDodgedTheBullets,
-      DateTime createdAt,
+      Timestamp createdAt,
       String platform});
 }
 
@@ -81,7 +81,7 @@ class _$RankCopyWithImpl<$Res, $Val extends Rank>
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as Timestamp,
       platform: null == platform
           ? _value.platform
           : platform // ignore: cast_nullable_to_non_nullable
@@ -102,7 +102,7 @@ abstract class _$$RankImplCopyWith<$Res> implements $RankCopyWith<$Res> {
       String name,
       int survivedTimeInMilliseconds,
       int brilliantlyDodgedTheBullets,
-      DateTime createdAt,
+      Timestamp createdAt,
       String platform});
 }
 
@@ -143,7 +143,7 @@ class __$$RankImplCopyWithImpl<$Res>
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
+              as Timestamp,
       platform: null == platform
           ? _value.platform
           : platform // ignore: cast_nullable_to_non_nullable
@@ -172,7 +172,7 @@ class _$RankImpl implements _Rank {
   @override
   final int brilliantlyDodgedTheBullets;
   @override
-  final DateTime createdAt;
+  final Timestamp createdAt;
   @override
   final String platform;
 
@@ -225,7 +225,7 @@ abstract class _Rank implements Rank {
       required final String name,
       required final int survivedTimeInMilliseconds,
       required final int brilliantlyDodgedTheBullets,
-      required final DateTime createdAt,
+      required final Timestamp createdAt,
       required final String platform}) = _$RankImpl;
 
   @override
@@ -237,7 +237,7 @@ abstract class _Rank implements Rank {
   @override
   int get brilliantlyDodgedTheBullets;
   @override
-  DateTime get createdAt;
+  Timestamp get createdAt;
   @override
   String get platform;
   @override

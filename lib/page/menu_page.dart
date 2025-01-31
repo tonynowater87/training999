@@ -54,7 +54,11 @@ class MenuPage extends Component
     _button2 = RoundedButton(
       text: '排行榜',
       action: () {
-        game.overlays.add('rank');
+        if (game.overlays.isActive('rank')) {
+          game.overlays.remove('rank');
+        } else {
+          game.overlays.add('rank');
+        }
       },
       color: const Color(0xffadde6c),
       borderColor: const Color(0xffedffab),

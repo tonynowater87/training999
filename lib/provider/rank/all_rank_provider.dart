@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:training999/provider/rank/model/rank.dart';
 
@@ -7,34 +8,27 @@ part 'all_rank_provider.g.dart';
 class AllRank extends _$AllRank {
   @override
   Future<List<Rank>> build() async {
-    // TODO listen from firestore
-    return generateRandomRankList();
+    return getRankList();
   }
 
-  void insertRecord(Rank rank) {
-    // TODO insert record to firestore
-    List<Rank> allRanks = [...state.value!, rank].toList();
-    allRanks.sort((a, b) =>
-        b.survivedTimeInMilliseconds.compareTo(a.survivedTimeInMilliseconds));
-    state = AsyncData(allRanks);
+  Future<void> insertRecord(Rank rank) async {
+    final docRef = FirebaseFirestore.instance.collection("ranks");
+    await docRef.add(rank.toFirestore());
+    state = AsyncData(await getRankList());
   }
 
-  static Future<List<Rank>> generateRandomRankList() async {
-    return Future.delayed(const Duration(seconds: 1), () {
-      final List<Rank> rankList = [];
-      for (int i = 0; i < 10; i++) {
-        rankList.add(Rank(
-          id: i,
-          name: 'Player $i',
-          survivedTimeInMilliseconds: i * 1000 + 5000,
-          brilliantlyDodgedTheBullets: i * 10,
-          createdAt: DateTime.now(),
-          platform: 'Android',
-        ));
-      }
-      rankList.sort((a, b) =>
-          b.survivedTimeInMilliseconds.compareTo(a.survivedTimeInMilliseconds));
-      return rankList;
-    });
+  static Future<List<Rank>> getRankList() async {
+    final docRef = FirebaseFirestore.instance
+        .collection("ranks")
+        .withConverter(
+            fromFirestore: Rank.fromFirestore,
+            toFirestore: (Rank rank, options) => rank.toFirestore())
+        .orderBy("survivedTimeInMilliseconds", descending: true);
+    final data = await docRef.get();
+    final List<Rank> rankList = [];
+    for (var element in data.docs) {
+      rankList.add(element.data());
+    }
+    return rankList;
   }
 }

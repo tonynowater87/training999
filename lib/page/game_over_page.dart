@@ -11,7 +11,6 @@ class GameOverPage extends Component with HasGameReference<Training999> {
 
   @override
   Future<void> onLoad() async {
-    debugPrint('[TONY] GameOverPage.onLoad()');
     _playAgainButton = RoundedButton(
       text: 'Play Again',
       action: () {
@@ -28,7 +27,6 @@ class GameOverPage extends Component with HasGameReference<Training999> {
 
   @override
   void onMount() {
-    debugPrint('[TONY] GameOverPage.onMount()');
     game.addBulletCountText();
     super.onMount();
   }

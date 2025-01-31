@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
@@ -280,13 +282,14 @@ class Training999 extends FlameGame
 
   void gameover() {
     isGameOver = true;
+    final now = Timestamp.now();
     ref.read(allRankProvider.notifier).insertRecord(Rank(
-        id: DateTime.now().millisecondsSinceEpoch,
+        id: now.millisecondsSinceEpoch,
         name: myName,
         survivedTimeInMilliseconds: surviveTime,
         brilliantlyDodgedTheBullets: brilliantlyDodgedTheBullet,
-        platform: 'Android',
-        createdAt: DateTime.now()));
+        platform: Platform.isAndroid ? 'Android' : 'iOS',
+        createdAt: now));
     overlays.add('rank');
     removeWhere((c) => c is JoystickComponent);
     removeWhere((c) => c is TimerComponent);
