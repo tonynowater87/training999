@@ -6,7 +6,6 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide Route;
@@ -26,6 +25,7 @@ import 'package:training999/provider/name/my_name_provider.dart';
 import 'package:training999/provider/rank/model/rank.dart';
 import 'package:training999/provider/rank/all_rank_provider.dart';
 import 'package:training999/util/bullet_level.dart';
+import 'package:training999/util/music_manager.dart';
 
 import 'components/detect_close_to_bullet.dart';
 
@@ -55,8 +55,7 @@ class Training999 extends FlameGame
   late final RouterComponent router;
   late Set<LogicalKeyboardKey> pressedKeySets;
   late String myName;
-  late AudioPool explosionAudioPool;
-  late AudioPool menuSelectAudioPool;
+  MusicManager musicManager = MusicManager();
 
   Training999() : super();
 
@@ -77,18 +76,8 @@ class Training999 extends FlameGame
   Future onLoad() async {
     super.onLoad();
     // debugMode = kDebugMode;
-    await FlameAudio.audioCache.loadAll(['effect/explosion.mp3', 'effect/menu_select.mp3']);
-    _startBgmMusic();
-    explosionAudioPool = await FlameAudio.createPool(
-      'effect/explosion.mp3',
-      minPlayers: 1,
-      maxPlayers: 1,
-    );
-    menuSelectAudioPool = await FlameAudio.createPool(
-      'effect/menu_select.mp3',
-      minPlayers: 1,
-      maxPlayers: 1,
-    );
+    await musicManager.init();
+    musicManager.playBgm();
     add(router = RouterComponent(initialRoute: "splash", routes: {
       'splash': Route(SplashPage.new),
       'menu': Route(MenuPage.new),
@@ -105,11 +94,6 @@ class Training999 extends FlameGame
     add(StarBackGroundCreator());
     initJoystick();
     pressedKeySets = {};
-  }
-
-  void _startBgmMusic() {
-    FlameAudio.bgm.initialize();
-    FlameAudio.bgm.play('music/bgm.mp3');
   }
 
   @override
@@ -300,7 +284,7 @@ class Training999 extends FlameGame
 
   void gameover() {
     isGameOver = true;
-    explosionAudioPool.start();
+    musicManager.playExplosion();
     final now = Timestamp.now();
     ref.read(allRankProvider.notifier).insertRecord(Rank(
         id: now.millisecondsSinceEpoch,

@@ -51,7 +51,7 @@ class MenuPage extends Component
     _button1 = RoundedButton(
       text: '開始遊戲',
       action: () {
-        game.menuSelectAudioPool.start();
+        game.musicManager.playMenuSelect();
         game.router.pop();
         game.start();
       },
@@ -61,7 +61,7 @@ class MenuPage extends Component
     _button2 = RoundedButton(
       text: '排行榜',
       action: () {
-        game.menuSelectAudioPool.start();
+        game.musicManager.playMenuSelect();
         if (game.overlays.isActive('rank')) {
           game.overlays.remove('rank');
         } else {

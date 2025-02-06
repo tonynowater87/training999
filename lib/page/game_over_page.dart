@@ -15,7 +15,7 @@ class GameOverPage extends Component with HasGameReference<Training999> {
     _playAgainButton = RoundedButton(
       text: 'Play Again',
       action: () {
-        game.menuSelectAudioPool.start();
+        game.musicManager.playMenuSelect();
         game.reset();
         game.router.pop();
         game.router.pushNamed("menu");
