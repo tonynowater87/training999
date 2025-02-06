@@ -6,6 +6,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide Route;
@@ -50,9 +51,12 @@ class Training999 extends FlameGame
   int lastTime = 0;
   int surviveTime = 0;
   int brilliantlyDodgedTheBullet = 0;
+
   late final RouterComponent router;
   late Set<LogicalKeyboardKey> pressedKeySets;
   late String myName;
+  late AudioPool explosionAudioPool;
+  late AudioPool menuSelectAudioPool;
 
   Training999() : super();
 
@@ -73,7 +77,18 @@ class Training999 extends FlameGame
   Future onLoad() async {
     super.onLoad();
     // debugMode = kDebugMode;
-
+    await FlameAudio.audioCache.loadAll(['effect/explosion.mp3', 'effect/menu_select.mp3']);
+    _startBgmMusic();
+    explosionAudioPool = await FlameAudio.createPool(
+      'effect/explosion.mp3',
+      minPlayers: 1,
+      maxPlayers: 1,
+    );
+    menuSelectAudioPool = await FlameAudio.createPool(
+      'effect/menu_select.mp3',
+      minPlayers: 1,
+      maxPlayers: 1,
+    );
     add(router = RouterComponent(initialRoute: "splash", routes: {
       'splash': Route(SplashPage.new),
       'menu': Route(MenuPage.new),
@@ -90,6 +105,11 @@ class Training999 extends FlameGame
     add(StarBackGroundCreator());
     initJoystick();
     pressedKeySets = {};
+  }
+
+  void _startBgmMusic() {
+    FlameAudio.bgm.initialize();
+    FlameAudio.bgm.play('music/bgm.mp3');
   }
 
   @override
@@ -280,6 +300,7 @@ class Training999 extends FlameGame
 
   void gameover() {
     isGameOver = true;
+    explosionAudioPool.start();
     final now = Timestamp.now();
     ref.read(allRankProvider.notifier).insertRecord(Rank(
         id: now.millisecondsSinceEpoch,

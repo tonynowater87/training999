@@ -1,6 +1,7 @@
 
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:training999/components/rounded_button.dart';
 import 'package:training999/training_999.dart';
@@ -14,6 +15,7 @@ class GameOverPage extends Component with HasGameReference<Training999> {
     _playAgainButton = RoundedButton(
       text: 'Play Again',
       action: () {
+        game.menuSelectAudioPool.start();
         game.reset();
         game.router.pop();
         game.router.pushNamed("menu");

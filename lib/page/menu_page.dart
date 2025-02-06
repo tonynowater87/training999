@@ -1,6 +1,7 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/painting.dart';
@@ -50,6 +51,7 @@ class MenuPage extends Component
     _button1 = RoundedButton(
       text: '開始遊戲',
       action: () {
+        game.menuSelectAudioPool.start();
         game.router.pop();
         game.start();
       },
@@ -59,6 +61,7 @@ class MenuPage extends Component
     _button2 = RoundedButton(
       text: '排行榜',
       action: () {
+        game.menuSelectAudioPool.start();
         if (game.overlays.isActive('rank')) {
           game.overlays.remove('rank');
         } else {
