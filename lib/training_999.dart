@@ -282,11 +282,12 @@ class Training999 extends FlameGame
     add(joystickRight);
   }
 
-  void gameover() {
+  Future<void> gameover() async {
     isGameOver = true;
     musicManager.playExplosion();
     final now = Timestamp.now();
-    ref.read(allRankProvider.notifier).insertRecord(Rank(
+    // 等待新增成功才顯示排行榜View (否則會先顯示先前的排行榜資料, 才再出現這次這筆)
+    await ref.read(allRankProvider.notifier).insertRecord(Rank(
         id: now.millisecondsSinceEpoch,
         name: myName,
         survivedTimeInMilliseconds: surviveTime,

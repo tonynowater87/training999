@@ -23,6 +23,7 @@ Future<void> main() async {
     observers: [MyProviderObserver()],
     child: MaterialApp(
       home: Scaffold(
+        resizeToAvoidBottomInset: false, // 避免顯示鍵盤變更遊戲畫布大小(造成星星背景也被鍵盤推上去)
         body: RiverpodAwareGameWidget<Training999>(
           overlayBuilderMap: {
             'enter_name': (context, game) => EnterNameWidget(),
