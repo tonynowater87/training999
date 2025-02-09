@@ -18,7 +18,6 @@ import 'package:training999/components/info_text.dart';
 import 'package:training999/components/score_text.dart';
 import 'package:training999/components/star_background_creator.dart';
 import 'package:training999/constant.dart';
-import 'package:training999/page/game_over_page.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
 import 'package:training999/provider/name/my_name_provider.dart';
@@ -81,7 +80,6 @@ class Training999 extends FlameGame
     add(router = RouterComponent(initialRoute: "splash", routes: {
       'splash': Route(SplashPage.new),
       'menu': Route(MenuPage.new),
-      'gameover': Route(GameOverPage.new),
     }));
 
     await images.loadAllImages();
@@ -154,8 +152,10 @@ class Training999 extends FlameGame
   }
 
   void addBulletCountText() {
-    calcBulletCount();
-    add(ScoreText());
+    if (gameTime != 0) {
+      calcBulletCount();
+      add(ScoreText());
+    }
   }
 
   void addBullet(BulletLevel bulletLevel) {

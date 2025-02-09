@@ -26,8 +26,17 @@ Future<void> main() async {
         resizeToAvoidBottomInset: false, // 避免顯示鍵盤變更遊戲畫布大小(造成星星背景也被鍵盤推上去)
         body: RiverpodAwareGameWidget<Training999>(
           overlayBuilderMap: {
-            'enter_name': (context, game) => EnterNameWidget(),
-            'rank': (context, game) => RankingListWidget(),
+            'enter_name': (context, game) => const EnterNameWidget(),
+            'rank': (context, game) {
+              game.addBulletCountText();
+              return RankingListWidget(
+                voidCallback: () {
+                  game.reset();
+                  game.overlays.remove('rank');
+                  game.router.pushNamed("menu");
+                },
+              );
+            }
           },
           game: kDebugMode ? Training999() : game,
           key: GlobalKey(),

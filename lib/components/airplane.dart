@@ -59,7 +59,6 @@ class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, Co
       game.calcBulletCount();
       explode();
       gameRef.gameover();
-      gameRef.router.pushNamed("gameover");
     }
   }
 

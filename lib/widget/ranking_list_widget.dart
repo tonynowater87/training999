@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:training999/provider/rank/my_latest_rank_provider.dart';
 import 'package:training999/provider/rank/all_rank_provider.dart';
+import 'package:training999/provider/rank/my_latest_rank_provider.dart';
 import 'package:training999/util/time_utils.dart';
 
 class RankingListWidget extends ConsumerWidget {
   final ScrollController _scrollController = ScrollController();
+  VoidCallback voidCallback;
 
-  RankingListWidget({super.key});
+  RankingListWidget({super.key, required this.voidCallback});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,40 +24,49 @@ class RankingListWidget extends ConsumerWidget {
           scrollTo(latestRankIndex, screenHeight);
           return Container(
             padding: const EdgeInsets.all(10),
-            width: MediaQuery.of(context).size.width / 3,
+            width: MediaQuery.of(context).size.width,
             height: screenHeight,
             color: Colors.black.withOpacity(0.5),
-            child: ListView.builder(
-              controller: _scrollController,
-              itemCount: rankList.length,
-              itemBuilder: (context, index) {
-                final rank = rankList[index];
-                return Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        color: latestRankIndex == index
-                            ? Colors.white
-                            : Colors.transparent),
-                  ),
-                  child: ListTile(
-                    title: Text('排名 ${index + 1}',
-                        style: TextStyle(color: Colors.white)),
-                    subtitle:
-                        Text(rank.name, style: TextStyle(color: Colors.white)),
-                    trailing: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                            "存活時間 ${formatMilliseconds(rank.survivedTimeInMilliseconds)}",
-                            style: TextStyle(color: Colors.white)),
-                        Text("絕妙度 ${rank.brilliantlyDodgedTheBullets}%",
-                            style: TextStyle(color: Colors.white)),
-                      ],
-                    ),
-                  ),
-                );
+            child: GestureDetector(
+              onTap: () {
+                voidCallback.call();
               },
+              child: CustomScrollView(
+                slivers: [
+                  const SliverToBoxAdapter(child: Text('排行榜')),
+                  SliverList.builder(
+                    itemCount: rankList.length,
+                    itemBuilder: (context, index) {
+                      final rank = rankList[index];
+                      return Container(
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: latestRankIndex == index
+                                  ? Colors.white
+                                  : Colors.transparent),
+                        ),
+                        child: ListTile(
+                          title: Text('排名 ${index + 1}',
+                              style: TextStyle(color: Colors.white)),
+                          subtitle: Text(rank.name,
+                              style: TextStyle(color: Colors.white)),
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "存活時間 ${formatMilliseconds(rank.survivedTimeInMilliseconds)}",
+                                  style: TextStyle(color: Colors.white)),
+                              Text("絕妙度 ${rank.brilliantlyDodgedTheBullets}%",
+                                  style: TextStyle(color: Colors.white)),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -79,12 +89,12 @@ class RankingListWidget extends ConsumerWidget {
     if (scrollOffset < 0) {
       return;
     }
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        scrollOffset,
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _scrollController.animateTo(
+    //     scrollOffset,
+    //     duration: const Duration(milliseconds: 500),
+    //     curve: Curves.easeInOut,
+    //   );
+    // });
   }
 }
