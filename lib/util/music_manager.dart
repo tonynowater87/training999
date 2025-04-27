@@ -7,6 +7,8 @@ class MusicManager {
     FlameAudio.bgm.initialize();
     await FlameAudio.audioCache.loadAll([
       'music/bgm.mp3',
+      'effect/explosion.mp3',
+      'effect/menu_select.mp3'
     ]);
   }
 
@@ -15,12 +17,12 @@ class MusicManager {
   }
 
   Future<void> playExplosion() async {
-    // TODO 處理音效播放, 不能影響遊戲流暢度和bgm
+    FlameAudio.play('effect/explosion.mp3');
 
   }
 
   Future<void> playMenuSelect() async {
-    // TODO 處理音效播放, 不能影響遊戲流暢度和bgm
+    FlameAudio.play('effect/menu_select.mp3');
   }
 
 }
