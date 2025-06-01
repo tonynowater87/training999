@@ -17,61 +17,75 @@ class RankingListWidget extends ConsumerWidget {
     final myLatestRank = ref.watch(myLatestRankProvider);
 
     return allRanks.when(
-        data: (rankList) {
-          int latestRankIndex =
-              rankList.indexWhere((element) => element.id == myLatestRank?.id);
+      data: (rankList) {
+        int latestRankIndex =
+        rankList.indexWhere((element) => element.id == myLatestRank?.id);
 
-          scrollTo(latestRankIndex, screenHeight);
-          return Container(
-            padding: const EdgeInsets.all(10),
-            width: MediaQuery.of(context).size.width,
-            height: screenHeight,
-            color: Colors.black.withOpacity(0.5),
-            child: GestureDetector(
-              onTap: () {
-                voidCallback.call();
-              },
-              child: CustomScrollView(
-                slivers: [
-                  const SliverToBoxAdapter(child: Text('排行榜')),
-                  SliverList.builder(
-                    itemCount: rankList.length,
-                    itemBuilder: (context, index) {
-                      final rank = rankList[index];
-                      return Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: latestRankIndex == index
-                                  ? Colors.white
-                                  : Colors.transparent),
+        scrollTo(latestRankIndex, screenHeight);
+        return Container(
+          padding: const EdgeInsets.all(10),
+          width: MediaQuery.of(context).size.width,
+          height: screenHeight,
+          color: Colors.black.withOpacity(0.5),
+          child: GestureDetector(
+            onTap: () {
+              voidCallback.call();
+            },
+            child: CustomScrollView(
+              slivers: [
+                const SliverToBoxAdapter(child: Text('排行榜')),
+                SliverList.builder(
+                  itemCount: rankList.length,
+                  itemBuilder: (context, index) {
+                    final rank = rankList[index];
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: latestRankIndex == index
+                              ? Colors.white
+                              : Colors.transparent,
                         ),
-                        child: ListTile(
-                          title: Text('排名 ${index + 1}',
-                              style: TextStyle(color: Colors.white)),
-                          subtitle: Text(rank.name,
-                              style: TextStyle(color: Colors.white)),
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  "存活時間 ${formatMilliseconds(rank.survivedTimeInMilliseconds)}",
-                                  style: TextStyle(color: Colors.white)),
-                              Text("絕妙度 ${rank.brilliantlyDodgedTheBullets}%",
-                                  style: TextStyle(color: Colors.white)),
-                            ],
-                          ),
+                      ),
+                      child: ListTile(titleAlignment: ListTileTitleAlignment.threeLine,
+                        title: Row(
+                          children: [
+                            Text(
+                              '排名 ${index + 1}',
+                              style: TextStyle(fontSize: 24, color: Colors.white),
+                            ),
+                            SizedBox(width: 16,),
+                            Text(
+                              rank.name,
+                              style: TextStyle(fontSize: 24, color: Colors.white),
+                            )
+                          ],
                         ),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              "存活時間 ${formatMilliseconds(rank.survivedTimeInMilliseconds)}",
+                              style: TextStyle(fontSize: 24, color: Colors.white),
+                            ),
+                        SizedBox(width: 16,),
+                            Text(
+                              "絕妙度 ${rank.brilliantlyDodgedTheBullets}%",
+                              style: TextStyle(fontSize: 24, color: Colors.white),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stackTrace) => Center(child: Text('Error: $error')));
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, stackTrace) => Center(child: Text('Error: $error')),
+    );
   }
 
   void scrollTo(int rank, double screenHeight) {
