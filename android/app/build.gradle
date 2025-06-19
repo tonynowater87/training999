@@ -29,11 +29,24 @@ if (flutterVersionName == null) {
 android {
     namespace = "com.tonynowater.training999"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
 
+    // Add this block if it doesn't exist, or modify if it does
+    kotlin {
+        jvmToolchain(21) // This tells Kotlin to use JVM 17. Adjust as needed (e.g., 11)
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(21) // This tells Java to use JVM 17
+        }
+    }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+
+    }
+
+    kotlinOptions {
+        jvmTarget = '21' // Or '11', depending on your needs and dependencies. '17' is a good modern choice.
     }
 
     defaultConfig {
