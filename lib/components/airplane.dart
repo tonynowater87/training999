@@ -1,15 +1,13 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:training999/components/bullet_hard.dart';
-import 'package:training999/components/bullet_mid.dart';
+import 'package:training999/components/bullet.dart';
 import 'package:training999/components/explosion.dart';
 import 'package:training999/training_999.dart';
 
-import 'bullet_easy.dart';
-
-class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, CollisionCallbacks {
-  Airplane() : super(size: Vector2(32, 39), anchor: Anchor.center, priority: 100);
+class Airplane extends SpriteAnimationComponent
+    with HasGameReference<Training999>, CollisionCallbacks {
+  Airplane()
+      : super(size: Vector2(32, 39), anchor: Anchor.center, priority: 100);
 
   @override
   Future<void> onLoad() async {
@@ -55,40 +53,22 @@ class Airplane extends SpriteAnimationComponent with HasGameRef<Training999>, Co
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
-    if (other is BulletEasy || other is BulletMid || other is BulletHard) {
-      game.calcBulletCount();
+    if (other is Bullet && !game.isGameOver) {
       explode();
-      gameRef.gameover();
+      game.gameover();
     }
   }
 
   @override
   void update(double dt) {
-    if (gameRef.isGameOver) {
+    if (game.isGameOver) {
       return;
     }
-    // check if the airplane is out of the screen
-    if (position.x - (size.x / 2) <= 0 &&
-        position.y + size.y / 2 >= game.canvasSize.y) {
-      position = Vector2(size.x / 2, game.canvasSize.y - size.y / 2);
-    } else if (position.x + size.x / 2 >= game.canvasSize.x &&
-        position.y + size.y / 2 >= game.canvasSize.y) {
-      position = Vector2(
-          game.canvasSize.x - size.x / 2, game.canvasSize.y - size.y / 2);
-    } else if (position.x + size.x / 2 >= game.canvasSize.x &&
-        position.y - size.y / 2 <= 0) {
-      position = Vector2(game.canvasSize.x - size.x / 2, size.y / 2);
-    } else if (position.x - size.x / 2 <= 0 && position.y - size.y / 2 <= 0) {
-      position = Vector2(size.x / 2, size.y / 2);
-    } else if (position.x - (size.x / 2) <= 0) {
-      position.x = size.x / 2;
-    } else if (position.y + size.y / 2 >= game.canvasSize.y) {
-      position.y = game.canvasSize.y - size.y / 2;
-    } else if (position.x + size.x / 2 >= game.canvasSize.x) {
-      position.x = game.canvasSize.x - size.x / 2;
-    } else if (position.y - size.y / 2 <= 0) {
-      position.y = size.y / 2;
-    }
+    // Keep the airplane inside the screen.
+    position.setValues(
+      position.x.clamp(size.x / 2, game.size.x - size.x / 2).toDouble(),
+      position.y.clamp(size.y / 2, game.size.y - size.y / 2).toDouble(),
+    );
     super.update(dt);
   }
 

@@ -1,10 +1,9 @@
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:training999/provider/name/all_name_provider.dart';
 import 'package:training999/provider/name/is_name_existed_provider.dart';
-import 'package:training999/provider/name/model/user_name.dart';
+import 'package:training999/provider/name/my_name_provider.dart';
+import 'package:training999/provider/name/name_repository.dart';
 import 'package:training999/provider/name/text_changed_provider.dart';
 
 // TODO 要怎麼在Widget裡取得GameReference呢？
@@ -14,11 +13,30 @@ class EnterNameWidget extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = useTextEditingController();
-    var isNameExisted = useState(false);
+    final isSubmitting = useState(false);
+    final submitError = useState<String?>(null);
+    final isNameExisted = ref.watch(isNameExistedProvider).valueOrNull ?? false;
     final screenWidth = MediaQuery.of(context).size.width;
-    ref.listen(isNameExistedProvider, (previous, current) {
-      isNameExisted.value = current.hasValue ? current.value! : false;
-    });
+
+    Future<void> submit(String value) async {
+      final name = value.trim();
+      if (name.isEmpty || isNameExisted || isSubmitting.value) {
+        return;
+      }
+      FocusScope.of(context).unfocus();
+      isSubmitting.value = true;
+      try {
+        final registered =
+            await ref.read(myNameProvider.notifier).register(name);
+        submitError.value = registered ? null : 'Name existed';
+      } catch (error) {
+        debugPrint('[EnterNameWidget] Failed to register name: $error');
+        submitError.value = 'Network error, please try again';
+      } finally {
+        isSubmitting.value = false;
+      }
+    }
+
     return Center(
       child: Container(
         width: screenWidth / 3,
@@ -32,26 +50,17 @@ class EnterNameWidget extends HookConsumerWidget {
                   style: TextStyle(color: Colors.white)),
               TextField(
                 controller: controller,
+                enabled: !isSubmitting.value,
+                maxLength: NameRepository.maxNameLength,
                 decoration: InputDecoration(
                   hintText: 'Your name',
                   helperText: 'It\'s used for ranking',
-                  errorText: isNameExisted.value && isNameExisted.value == true
-                      ? 'Name existed'
-                      : null,
+                  errorText: isNameExisted ? 'Name existed' : submitError.value,
                 ),
                 style: const TextStyle(color: Colors.white),
-                onSubmitted: (String? value) async {
-                  if (isNameExisted.value) {
-                    return;
-                  }
-                  FocusScope.of(context).unfocus();
-                  if (value != null && value.isNotEmpty) {
-                    ref
-                        .read(allNameProviderProvider.notifier)
-                        .addName(value);
-                  }
-                },
+                onSubmitted: submit,
                 onChanged: (String value) {
+                  submitError.value = null;
                   ref.read(textChangedProvider.notifier).setName(value);
                 },
               ),

@@ -1,14 +1,10 @@
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:training999/components/bullet_hard.dart';
-import 'package:training999/components/bullet_mid.dart';
+import 'package:training999/components/bullet.dart';
 import 'package:training999/training_999.dart';
 
-import 'bullet_easy.dart';
-
 class DetectCloseToBullet extends PositionComponent
-    with HasGameRef<Training999>, CollisionCallbacks {
+    with HasGameReference<Training999>, CollisionCallbacks {
   DetectCloseToBullet() : super(size: Vector2(48, 58.5));
 
   @override
@@ -47,10 +43,11 @@ class DetectCloseToBullet extends PositionComponent
     PositionComponent other,
   ) {
     super.onCollisionStart(intersectionPoints, other);
-    if (other is BulletEasy || other is BulletMid || other is BulletHard) {
-      debugPrint('[TONY] 絕妙度過子彈!!!！');
+    if (other is Bullet) {
+      // Wait a moment: if the same bullet also hits the airplane, the game
+      // is over and it must not count as a brilliant dodge.
       Future.delayed(const Duration(milliseconds: 50), () {
-        if (gameRef.isGameOver) {
+        if (game.isGameOver) {
           return;
         }
         game.addBrilliantlyDodgedTheBulletText();
@@ -61,9 +58,9 @@ class DetectCloseToBullet extends PositionComponent
   @override
   void update(double dt) {
     super.update(dt);
-    if (gameRef.isGameOver) {
+    if (game.isGameOver) {
       return;
     }
-    position = gameRef.player.position;
+    position = game.player.position;
   }
 }

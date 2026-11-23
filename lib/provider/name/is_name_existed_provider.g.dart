@@ -6,7 +6,7 @@ part of 'is_name_existed_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$isNameExistedHash() => r'62a50d025012f44803211aeaaa7e2df9db841733';
+String _$isNameExistedHash() => r'ccf2456dc2fde0a42f8c83930b360157b58ad6f5';
 
 /// See also [isNameExisted].
 @ProviderFor(isNameExisted)

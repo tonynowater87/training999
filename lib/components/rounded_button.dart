@@ -4,21 +4,23 @@ import 'package:flame/text.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 
-class RoundedButton extends PositionComponent with TapCallbacks, KeyboardHandler {
+class RoundedButton extends PositionComponent
+    with TapCallbacks, KeyboardHandler {
   RoundedButton({
     required this.text,
     required this.action,
     required Color color,
     required Color borderColor,
+    this.shortcutKeys = const {},
     super.position,
     super.anchor = Anchor.center,
   }) : _textDrawable = TextPaint(
-    style: const TextStyle(
-      fontSize: 20,
-      color: Color(0xFF000000),
-      fontWeight: FontWeight.w800,
-    ),
-  ).toTextPainter(text) {
+          style: const TextStyle(
+            fontSize: 20,
+            color: Color(0xFF000000),
+            fontWeight: FontWeight.w800,
+          ),
+        ).toTextPainter(text) {
     size = Vector2(150, 40);
     _textOffset = Offset(
       (size.x - _textDrawable.width) / 2,
@@ -34,6 +36,10 @@ class RoundedButton extends PositionComponent with TapCallbacks, KeyboardHandler
 
   final String text;
   final void Function() action;
+
+  /// Keys that trigger [action]. Only one button on a page should own a key,
+  /// otherwise a single key press triggers several buttons at once.
+  final Set<LogicalKeyboardKey> shortcutKeys;
   final TextPainter _textDrawable;
   late final Offset _textOffset;
   late final RRect _rrect;
@@ -65,13 +71,9 @@ class RoundedButton extends PositionComponent with TapCallbacks, KeyboardHandler
 
   @override
   bool onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
-    if (event.logicalKey == LogicalKeyboardKey.enter && event is KeyUpEvent) {
+    if (event is KeyUpEvent && shortcutKeys.contains(event.logicalKey)) {
       action();
-      return true;
-    }
-    if (event.logicalKey == LogicalKeyboardKey.space && event is KeyUpEvent) {
-      action();
-      return true;
+      return false;
     }
     return super.onKeyEvent(event, keysPressed);
   }

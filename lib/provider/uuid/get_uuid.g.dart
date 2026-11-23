@@ -21,7 +21,7 @@ final getSecureStorageProvider = Provider<FlutterSecureStorage>.internal(
 );
 
 typedef GetSecureStorageRef = ProviderRef<FlutterSecureStorage>;
-String _$getUuidHash() => r'4974559f87ed83c9a567607fea62ec0655a08ccf';
+String _$getUuidHash() => r'0c89cdb729c325bedb5281d309a06c733f8034c7';
 
 /// See also [getUuid].
 @ProviderFor(getUuid)

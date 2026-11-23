@@ -1,46 +1,44 @@
+import 'dart:math';
+
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:training999/components/bullet.dart';
 import 'package:training999/training_999.dart';
+import 'package:training999/util/bullet_level.dart';
 
 class BulletEasy extends CircleComponent
-    with HasGameRef<Training999>, CollisionCallbacks {
-  late Vector2 _velocity;
-  late Vector2 direction;
+    with HasGameReference<Training999>, CollisionCallbacks, Bullet {
+  BulletEasy(Vector2 position, {required this.angleOffset})
+      : super(
+          position: position,
+          radius: BulletLevel.easy.getRadius(),
+          anchor: Anchor.center,
+        );
 
-  BulletEasy(position)
-      : super(position: position, radius: 2, anchor: Anchor.center);
+  /// Random spread around the direction to the screen center.
+  final double angleOffset;
+
+  @override
+  BulletLevel get level => BulletLevel.easy;
+
+  static double randomSpread(Random rng) =>
+      (rng.nextDouble() * 2 - 1) * easyBulletSpread;
 
   @override
   Future<void> onLoad() async {
-    super.onLoad();
-
+    await super.onLoad();
     add(CircleHitbox());
-
-    paint = Paint()..color = Colors.orange;
-
-    var centerX = game.canvasSize.x / 2;
-    var centerY = game.canvasSize.y / 2;
-
-    direction =
-        Vector2(centerX > position.x ? 1 : -1, centerY > position.y ? 1 : -1);
-    _velocity = Vector2(direction.x * 100, direction.y * 100);
+    paint = Paint()..color = level.getColor();
+    aimAt(game.size / 2, angleOffset: angleOffset);
   }
 
   @override
   void update(double dt) {
     super.update(dt);
-    if (gameRef.isGameOver) {
+    if (game.isGameOver) {
       return;
     }
-
-    position.add(direction + _velocity * dt);
-
-    if (position.y < -game.gameSizeOfRadius / 2 ||
-        position.y > game.size.y + game.gameSizeOfRadius / 4 ||
-        position.x > game.size.x + game.gameSizeOfRadius / 2 ||
-        position.x + size.x < -game.gameSizeOfRadius / 4) {
-      removeFromParent();
-    }
+    moveBullet(dt);
   }
 }

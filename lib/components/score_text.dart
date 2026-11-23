@@ -2,8 +2,7 @@ import 'package:flame/components.dart';
 import 'package:training999/training_999.dart';
 import 'package:training999/util/time_utils.dart';
 
-class ScoreText extends TextComponent with HasGameRef<Training999> {
-
+class ScoreText extends TextComponent with HasGameReference<Training999> {
   @override
   Future<void> onLoad() async {
     anchor = Anchor.topCenter;
@@ -18,7 +17,8 @@ class ScoreText extends TextComponent with HasGameRef<Training999> {
 
   @override
   void update(double dt) {
-    text = '存活時間:${formatMilliseconds(game.surviveTime)}絕妙度:${gameRef.brilliantlyDodgedTheBullet}%';
+    text =
+        '存活時間:${formatMilliseconds(game.surviveTime)}秒  絕妙度:${game.brilliantlyDodgedTheBullet}';
     super.update(dt);
   }
 }

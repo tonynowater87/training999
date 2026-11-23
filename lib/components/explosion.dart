@@ -2,14 +2,13 @@ import 'package:flame/components.dart';
 import 'package:training999/training_999.dart';
 
 class ExplosionComponent extends SpriteAnimationComponent
-    with HasGameRef<Training999> {
+    with HasGameReference<Training999> {
   ExplosionComponent({super.position})
       : super(
-          size: Vector2.all(50),
-          anchor: Anchor.center,
-          removeOnFinish: false,
-          priority: 200
-        );
+            size: Vector2.all(50),
+            anchor: Anchor.center,
+            removeOnFinish: false,
+            priority: 200);
 
   @override
   Future<void> onLoad() async {

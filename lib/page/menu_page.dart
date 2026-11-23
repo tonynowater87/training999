@@ -1,10 +1,9 @@
 import 'package:flame/components.dart';
 import 'package:flame/extensions.dart';
 import 'package:flame/text.dart';
-import 'package:flame_audio/flame_audio.dart';
 import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/painting.dart';
+import 'package:flutter/services.dart';
 import 'package:training999/components/rounded_button.dart';
 import 'package:training999/provider/name/my_name_provider.dart';
 import 'package:training999/training_999.dart';
@@ -57,6 +56,7 @@ class MenuPage extends Component
       },
       color: const Color(0xffadde6c),
       borderColor: const Color(0xffedffab),
+      shortcutKeys: {LogicalKeyboardKey.enter, LogicalKeyboardKey.space},
     );
     _button2 = RoundedButton(
       text: '排行榜',
@@ -97,9 +97,4 @@ class MenuPage extends Component
 
   @override
   bool containsPoint(Vector2 point) => true;
-
-  @override
-  void onRemove() {
-    super.onRemove();
-  }
 }

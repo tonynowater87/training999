@@ -1,15 +1,16 @@
-import 'dart:io';
+import 'dart:async';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/extensions.dart';
 import 'package:flame/game.dart';
 import 'package:flame_riverpod/flame_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide Route;
 import 'package:training999/components/airplane.dart';
+import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_easy.dart';
 import 'package:training999/components/bullet_hard.dart';
 import 'package:training999/components/bullet_mid.dart';
@@ -17,12 +18,13 @@ import 'package:training999/components/explosion.dart';
 import 'package:training999/components/info_text.dart';
 import 'package:training999/components/score_text.dart';
 import 'package:training999/components/star_background_creator.dart';
-import 'package:training999/constant.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
 import 'package:training999/provider/name/my_name_provider.dart';
-import 'package:training999/provider/rank/model/rank.dart';
 import 'package:training999/provider/rank/all_rank_provider.dart';
+import 'package:training999/provider/rank/model/rank.dart';
+import 'package:training999/provider/rank/my_latest_rank_provider.dart';
+import 'package:training999/provider/uuid/get_uuid.dart';
 import 'package:training999/util/bullet_level.dart';
 import 'package:training999/util/music_manager.dart';
 
@@ -35,46 +37,77 @@ class Training999 extends FlameGame
         TapCallbacks,
         HasCollisionDetection,
         HasKeyboardHandlerComponents {
-  static const double _joystickControllerConstant = 1.5;
-  static const double _keyControllerConstant = 1.5;
-  double _timeElapsed = 0;
+  /// Player speed in pixels per second at full joystick tilt / key press.
+  static const double playerSpeed = 150;
+
+  /// Upper bound for a single simulation step. Frames slower than this are
+  /// simulated in slow motion instead of letting objects jump (tunneling).
+  /// Survive time uses the same clamped value, so scoring stays fair.
+  static const double _maxStepTime = 1 / 30;
+
+  /// Spawn bullets slightly outside the screen corners.
+  static const double _spawnMargin = 8;
+
+  /// Extra distance a bullet may travel past the spawn circle before removal.
+  static const double _despawnMargin = 50;
+
+  /// Timeout for uploading a record, so an offline device never blocks the
+  /// game-over flow (Firestore writes wait for the server acknowledgement).
+  static const Duration _uploadTimeout = Duration(seconds: 5);
+
+  static final Set<LogicalKeyboardKey> _upKeys = {
+    LogicalKeyboardKey.arrowUp,
+    LogicalKeyboardKey.keyW,
+  };
+  static final Set<LogicalKeyboardKey> _downKeys = {
+    LogicalKeyboardKey.arrowDown,
+    LogicalKeyboardKey.keyS,
+  };
+  static final Set<LogicalKeyboardKey> _leftKeys = {
+    LogicalKeyboardKey.arrowLeft,
+    LogicalKeyboardKey.keyA,
+  };
+  static final Set<LogicalKeyboardKey> _rightKeys = {
+    LogicalKeyboardKey.arrowRight,
+    LogicalKeyboardKey.keyD,
+  };
 
   late Airplane player;
   late DetectCloseToBullet detectCloseToBullet;
   late JoystickComponent joystickLeft;
   late JoystickComponent joystickRight;
-  late double gameSizeOfRadius;
-  int bulletCount = 0;
   bool isGameOver = true;
   int gameTime = 0;
-  int lastTime = 0;
-  int surviveTime = 0;
   int brilliantlyDodgedTheBullet = 0;
+  double _survivedSeconds = 0;
 
   late final RouterComponent router;
-  late Set<LogicalKeyboardKey> pressedKeySets;
-  late String myName;
+  final Set<LogicalKeyboardKey> pressedKeySets = {};
+  String myName = '';
   MusicManager musicManager = MusicManager();
+  final Random _rng = Random();
 
   Training999() : super();
+
+  /// Survive time of the current run in milliseconds.
+  int get surviveTime => (_survivedSeconds * 1000).round();
+
+  /// Distance from the screen center to a corner.
+  double get gameSizeOfRadius => size.length / 2;
+
+  double get _bulletSpawnRadius => gameSizeOfRadius + _spawnMargin;
+
+  double get bulletDespawnRadius => _bulletSpawnRadius + _despawnMargin;
 
   @override
   bool get pauseWhenBackgrounded => true;
 
-  // 0xFF001030
-  // 0xFF000030
   @override
   Color backgroundColor() => const Color(0xFF001030);
 
   @override
-  void stepEngine({double stepTime = 1 / 60}) {
-    super.stepEngine();
-  }
-
-  @override
   Future onLoad() async {
-    super.onLoad();
-    // debugMode = kDebugMode;
+    await super.onLoad();
     await musicManager.init();
     musicManager.playBgm();
     add(router = RouterComponent(initialRoute: "splash", routes: {
@@ -83,29 +116,24 @@ class Training999 extends FlameGame
     }));
 
     await images.loadAllImages();
-    gameSizeOfRadius = pow(
-            pow(camera.viewport.size.x, 2) + pow(camera.viewport.size.y, 2),
-            0.5) /
-        2.0;
     player = Airplane();
     detectCloseToBullet = DetectCloseToBullet();
     add(StarBackGroundCreator());
     initJoystick();
-    pressedKeySets = {};
   }
 
   @override
   void onMount() {
-    ref.read(allRankProvider); // 提前觸發 allRankProvider 的 build
+    ref.read(allRankProvider); // Trigger allRankProvider build early.
     addToGameWidgetBuild(() {
-      // 在這裡才能操作riverpod
+      // Riverpod can only be used from here.
       ref.listen(myNameProvider, (previous, current) {
         if (current.hasValue && current.value!.name.isNotEmpty) {
           myName = current.value!.name;
           overlays.remove("enter_name");
         }
       }, onError: (error, stackTrace) {
-
+        debugPrint('[Training999] Failed to load my name: $error');
       });
     });
     super.onMount();
@@ -114,11 +142,11 @@ class Training999 extends FlameGame
   void start() {
     isGameOver = false;
     overlays.clear();
-    if (!contains(player)) {
+    if (!player.isMounted) {
       add(player);
       add(detectCloseToBullet);
     }
-    if (!contains(joystickLeft) || !contains(joystickRight)) {
+    if (!joystickLeft.isMounted || !joystickRight.isMounted) {
       addJoystick();
     }
 
@@ -151,26 +179,18 @@ class Training999 extends FlameGame
         }));
   }
 
-  void addBulletCountText() {
-    if (gameTime != 0) {
-      calcBulletCount();
-      add(ScoreText());
-    }
-  }
-
   void addBullet(BulletLevel bulletLevel) {
-    final Random _rng = Random(DateTime.now().millisecondsSinceEpoch);
     add(SpawnComponent(
         selfPositioning: true,
         factory: (int amount) {
-          var angle = _rng.nextDouble() * 360;
-          var radians = angle * pi / 180;
-          Vector2 position = Vector2(gameSizeOfRadius * cos(radians),
-                  gameSizeOfRadius * sin(radians))
-              .translated(size.x / 2, size.y / 2);
+          final radians = _rng.nextDouble() * 2 * pi;
+          final position =
+              Vector2(cos(radians), sin(radians)) * _bulletSpawnRadius +
+                  size / 2;
           switch (bulletLevel) {
             case BulletLevel.easy:
-              return BulletEasy(position);
+              return BulletEasy(position,
+                  angleOffset: BulletEasy.randomSpread(_rng));
             case BulletLevel.middle:
               return BulletMid(position);
             case BulletLevel.hard:
@@ -187,25 +207,16 @@ class Training999 extends FlameGame
 
   @override
   void updateTree(double dt) {
-    _timeElapsed += dt;
-    // // make sure we update at most 60fps
-    if (_timeElapsed > timePerFrame) {
-      _timeElapsed -= timePerFrame;
-      updateJoystick();
-      updateKeys();
-      super.updateTree(timePerFrame);
-    }
+    super.updateTree(min(dt, _maxStepTime));
   }
 
   @override
   void update(double dt) {
     if (!isGameOver) {
-      var dateTime = DateTime.now();
-      if (lastTime == 0) {
-        lastTime = dateTime.millisecondsSinceEpoch;
-      }
-      var now = dateTime.millisecondsSinceEpoch;
-      surviveTime = now - lastTime;
+      // Accumulate simulated time only, so paused (backgrounded) time and
+      // slow devices cannot inflate the score.
+      _survivedSeconds += dt;
+      _movePlayer(dt);
     }
     super.update(dt);
   }
@@ -215,66 +226,44 @@ class Training999 extends FlameGame
       KeyEvent event, Set<LogicalKeyboardKey> keysPressed) {
     super.onKeyEvent(event, keysPressed);
 
+    // Always track the current state, so a key released during game over
+    // does not keep moving the player in the next run.
+    pressedKeySets
+      ..clear()
+      ..addAll(keysPressed.where(_isMovementKey));
+
     if (isGameOver) {
       return KeyEventResult.ignored;
     }
-
-    _clearPressedKeys();
-    for (final key in keysPressed) {
-      if (key == LogicalKeyboardKey.arrowUp || key == LogicalKeyboardKey.keyW) {
-        pressedKeySets.add(key);
-      } else if (key == LogicalKeyboardKey.arrowDown ||
-          key == LogicalKeyboardKey.keyS) {
-        pressedKeySets.add(key);
-      } else if (key == LogicalKeyboardKey.arrowLeft ||
-          key == LogicalKeyboardKey.keyA) {
-        pressedKeySets.add(key);
-      } else if (key == LogicalKeyboardKey.arrowRight ||
-          key == LogicalKeyboardKey.keyD) {
-        pressedKeySets.add(key);
-      } else {
-        return KeyEventResult.ignored;
-      }
-    }
-
-    return KeyEventResult.handled;
+    return _isMovementKey(event.logicalKey)
+        ? KeyEventResult.handled
+        : KeyEventResult.ignored;
   }
 
-  void _clearPressedKeys() {
-    pressedKeySets.clear();
-  }
+  bool _isMovementKey(LogicalKeyboardKey key) =>
+      _upKeys.contains(key) ||
+      _downKeys.contains(key) ||
+      _leftKeys.contains(key) ||
+      _rightKeys.contains(key);
 
   void initJoystick() {
-    joystickLeft = JoystickComponent(
+    joystickLeft = _createJoystick(Vector2(64, canvasSize.y - 64));
+    joystickRight =
+        _createJoystick(Vector2(canvasSize.x - 64, canvasSize.y - 64));
+  }
+
+  JoystickComponent _createJoystick(Vector2 position) {
+    return JoystickComponent(
         priority: 10,
         knob: SpriteComponent(
           size: Vector2(50, 50),
-          sprite: Sprite(
-            images.fromCache('Knob.png'),
-          ),
+          sprite: Sprite(images.fromCache('Knob.png')),
         ),
         background: SpriteComponent(
           size: Vector2(64, 64),
-          sprite: Sprite(
-            images.fromCache('Joystick.png'),
-          ),
+          sprite: Sprite(images.fromCache('Joystick.png')),
         ),
-        position: Vector2(64, canvasSize.y - 64));
-    joystickRight = JoystickComponent(
-        priority: 10,
-        knob: SpriteComponent(
-          size: Vector2(50, 50),
-          sprite: Sprite(
-            images.fromCache('Knob.png'),
-          ),
-        ),
-        background: SpriteComponent(
-          size: Vector2(64, 64),
-          sprite: Sprite(
-            images.fromCache('Joystick.png'),
-          ),
-        ),
-        position: Vector2(canvasSize.x - 64, canvasSize.y - 64));
+        position: position);
   }
 
   void addJoystick() {
@@ -283,139 +272,104 @@ class Training999 extends FlameGame
   }
 
   Future<void> gameover() async {
+    // Several bullets can hit the player in the same frame; only the first
+    // hit may end the game, otherwise the record is uploaded twice.
+    if (isGameOver) {
+      return;
+    }
     isGameOver = true;
     musicManager.playExplosion();
+    // Stop spawning before the (possibly slow) upload starts.
+    removeWhere((c) =>
+        c is JoystickComponent || c is TimerComponent || c is SpawnComponent);
+
+    final myNameState = ref.read(myNameProvider);
     final now = Timestamp.now();
-    // 等待新增成功才顯示排行榜View (否則會先顯示先前的排行榜資料, 才再出現這次這筆)
-    await ref.read(allRankProvider.notifier).insertRecord(Rank(
+    final rank = Rank(
         id: now.millisecondsSinceEpoch,
-        name: myName,
+        name: myNameState.hasValue ? myNameState.value!.name : myName,
+        uuid: await _readUuid(),
         survivedTimeInMilliseconds: surviveTime,
         brilliantlyDodgedTheBullets: brilliantlyDodgedTheBullet,
-        platform: Platform.isAndroid ? 'Android' : 'iOS',
-        createdAt: now));
+        platform: _platformName,
+        createdAt: now);
+    ref.read(myLatestRankProvider.notifier).set(rank);
+    try {
+      // Wait for the upload, otherwise the ranking shows stale data first.
+      await ref
+          .read(allRankProvider.notifier)
+          .insertRecord(rank)
+          .timeout(_uploadTimeout);
+    } catch (error) {
+      debugPrint('[Training999] Failed to upload rank: $error');
+    }
+
+    if (!children.any((c) => c is ScoreText)) {
+      add(ScoreText());
+    }
     overlays.add('rank');
-    removeWhere((c) => c is JoystickComponent);
-    removeWhere((c) => c is TimerComponent);
-    removeWhere((c) => c is SpawnComponent);
+  }
+
+  Future<String?> _readUuid() async {
+    try {
+      return await ref.read(getUuidProvider.future);
+    } catch (error) {
+      debugPrint('[Training999] Failed to read uuid: $error');
+      return null;
+    }
+  }
+
+  static String get _platformName {
+    if (kIsWeb) {
+      return 'Web';
+    }
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'Android';
+      case TargetPlatform.iOS:
+        return 'iOS';
+      case TargetPlatform.macOS:
+        return 'macOS';
+      case TargetPlatform.windows:
+        return 'Windows';
+      case TargetPlatform.linux:
+        return 'Linux';
+      case TargetPlatform.fuchsia:
+        return 'Fuchsia';
+    }
   }
 
   void reset() {
     overlays.remove('rank');
     removeWhere((c) =>
-        c is BulletEasy ||
-        c is BulletMid ||
-        c is BulletHard ||
+        c is Bullet ||
         c is TimerComponent ||
         c is SpawnComponent ||
         c is ExplosionComponent ||
         c is ScoreText);
-    bulletCount = 0;
     gameTime = 0;
-    surviveTime = 0;
-    lastTime = 0;
+    _survivedSeconds = 0;
     brilliantlyDodgedTheBullet = 0;
+    pressedKeySets.clear();
+    player.position = size / 2;
   }
 
-  void updateJoystick() {
-    if (isGameOver) {
-      return;
+  void _movePlayer(double dt) {
+    final direction = joystickLeft.relativeDelta + joystickRight.relativeDelta
+      ..add(_keyboardDirection());
+    // Cap at full speed, so diagonals and two joysticks are not faster.
+    if (direction.length2 > 1) {
+      direction.normalize();
     }
-    switch (joystickLeft.direction) {
-      case JoystickDirection.left:
-        player.position += Vector2(-_joystickControllerConstant, 0);
-        break;
-      case JoystickDirection.upLeft:
-        player.position +=
-            Vector2(-_joystickControllerConstant, -_joystickControllerConstant);
-        break;
-      case JoystickDirection.up:
-        player.position += Vector2(0, -_joystickControllerConstant);
-        break;
-      case JoystickDirection.upRight:
-        player.position +=
-            Vector2(_joystickControllerConstant, -_joystickControllerConstant);
-        break;
-      case JoystickDirection.right:
-        player.position += Vector2(_joystickControllerConstant, 0);
-        break;
-      case JoystickDirection.downRight:
-        player.position +=
-            Vector2(_joystickControllerConstant, _joystickControllerConstant);
-        break;
-      case JoystickDirection.down:
-        player.position += Vector2(0, _joystickControllerConstant);
-        break;
-      case JoystickDirection.downLeft:
-        player.position +=
-            Vector2(-_joystickControllerConstant, _joystickControllerConstant);
-        break;
-      default:
-        player.position += Vector2(0, 0);
-        break;
-    }
-
-    switch (joystickRight.direction) {
-      case JoystickDirection.left:
-        player.position += Vector2(-_joystickControllerConstant, 0);
-        break;
-      case JoystickDirection.upLeft:
-        player.position +=
-            Vector2(-_joystickControllerConstant, -_joystickControllerConstant);
-        break;
-      case JoystickDirection.up:
-        player.position += Vector2(0, -_joystickControllerConstant);
-        break;
-      case JoystickDirection.upRight:
-        player.position +=
-            Vector2(_joystickControllerConstant, -_joystickControllerConstant);
-        break;
-      case JoystickDirection.right:
-        player.position += Vector2(_joystickControllerConstant, 0);
-        break;
-      case JoystickDirection.downRight:
-        player.position +=
-            Vector2(_joystickControllerConstant, _joystickControllerConstant);
-        break;
-      case JoystickDirection.down:
-        player.position += Vector2(0, _joystickControllerConstant);
-        break;
-      case JoystickDirection.downLeft:
-        player.position +=
-            Vector2(-_joystickControllerConstant, _joystickControllerConstant);
-        break;
-      default:
-        player.position += Vector2(0, 0);
-        break;
-    }
-    player.position += joystickLeft.relativeDelta + joystickRight.relativeDelta;
+    player.position.addScaled(direction, playerSpeed * dt);
   }
 
-  void calcBulletCount() {
-    bulletCount = children.whereType<BulletEasy>().length +
-        children.whereType<BulletMid>().length +
-        children.whereType<BulletHard>().length;
-  }
-
-  void updateKeys() {
-    if (isGameOver) {
-      return;
-    }
-    if (pressedKeySets.contains(LogicalKeyboardKey.arrowUp) ||
-        pressedKeySets.contains(LogicalKeyboardKey.keyW)) {
-      player.position += Vector2(0, -_keyControllerConstant);
-    }
-    if (pressedKeySets.contains(LogicalKeyboardKey.arrowDown) ||
-        pressedKeySets.contains(LogicalKeyboardKey.keyS)) {
-      player.position += Vector2(0, _keyControllerConstant);
-    }
-    if (pressedKeySets.contains(LogicalKeyboardKey.arrowLeft) ||
-        pressedKeySets.contains(LogicalKeyboardKey.keyA)) {
-      player.position += Vector2(-_keyControllerConstant, 0);
-    }
-    if (pressedKeySets.contains(LogicalKeyboardKey.arrowRight) ||
-        pressedKeySets.contains(LogicalKeyboardKey.keyD)) {
-      player.position += Vector2(_keyControllerConstant, 0);
-    }
+  Vector2 _keyboardDirection() {
+    final direction = Vector2.zero();
+    if (pressedKeySets.any(_upKeys.contains)) direction.y -= 1;
+    if (pressedKeySets.any(_downKeys.contains)) direction.y += 1;
+    if (pressedKeySets.any(_leftKeys.contains)) direction.x -= 1;
+    if (pressedKeySets.any(_rightKeys.contains)) direction.x += 1;
+    return direction;
   }
 }

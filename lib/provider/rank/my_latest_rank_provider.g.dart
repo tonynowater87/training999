@@ -6,12 +6,14 @@ part of 'my_latest_rank_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$myLatestRankHash() => r'70b4b5e35a9d3f039141553005730a2481e302a3';
+String _$myLatestRankHash() => r'b30dd605a731d58af56ef9f0a43fc896e14fae74';
 
-/// See also [myLatestRank].
-@ProviderFor(myLatestRank)
-final myLatestRankProvider = AutoDisposeProvider<Rank?>.internal(
-  myLatestRank,
+/// The record of the last finished run on this device, or null.
+///
+/// Copied from [MyLatestRank].
+@ProviderFor(MyLatestRank)
+final myLatestRankProvider = NotifierProvider<MyLatestRank, Rank?>.internal(
+  MyLatestRank.new,
   name: r'myLatestRankProvider',
   debugGetCreateSourceHash:
       const bool.fromEnvironment('dart.vm.product') ? null : _$myLatestRankHash,
@@ -19,6 +21,6 @@ final myLatestRankProvider = AutoDisposeProvider<Rank?>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef MyLatestRankRef = AutoDisposeProviderRef<Rank?>;
+typedef _$MyLatestRank = Notifier<Rank?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -1,11 +1,10 @@
-import 'package:flame/flame.dart';
 import 'package:flame_audio/flame_audio.dart';
 
 class MusicManager {
   late AudioPool _explosionPool; // 宣告 AudioPool 實例
   late AudioPool _menuSelectPool;
 
-  init() async {
+  Future<void> init() async {
     await FlameAudio.audioCache.loadAll(
         ['music/bgm.mp3', 'effect/explosion.mp3', 'effect/menu_select.mp3']);
 
