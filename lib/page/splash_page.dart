@@ -1,27 +1,13 @@
 import 'package:flame/components.dart';
-import 'package:flame/text.dart';
-import 'package:flutter/rendering.dart';
+import 'package:training999/components/logo.dart';
 import 'package:training999/training_999.dart';
 
 class SplashPage extends Component with HasGameReference<Training999> {
-
-  late TextComponent _logo;
+  late LogoComponent _logo;
 
   @override
   Future<void> onLoad() async {
-    addAll([
-      _logo = TextComponent(
-        text: '特訓999',
-        textRenderer: TextPaint(
-          style: const TextStyle(
-            fontSize: 64,
-            color: Color(0xFFC8FFF5),
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        anchor: Anchor.center,
-      ),
-    ]);
+    add(_logo = LogoComponent());
   }
 
   @override

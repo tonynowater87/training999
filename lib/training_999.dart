@@ -10,15 +10,16 @@ import 'package:flame_riverpod/flame_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart' hide Route;
+import 'package:training999/art/ui_theme.dart';
 import 'package:training999/components/airplane.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/components/bullet_easy.dart';
 import 'package:training999/components/bullet_hard.dart';
 import 'package:training999/components/bullet_mid.dart';
 import 'package:training999/components/explosion.dart';
+import 'package:training999/components/hud.dart';
 import 'package:training999/components/info_text.dart';
 import 'package:training999/components/item_bar.dart';
-import 'package:training999/components/score_text.dart';
 import 'package:training999/components/shield.dart';
 import 'package:training999/components/star_background_creator.dart';
 import 'package:training999/page/menu_page.dart';
@@ -70,6 +71,7 @@ class Training999 extends FlameGame
 
   /// Vertical distance between announcements shown in the same second.
   static const double _announcementLineHeight = 30;
+  static const double _announcementTop = 14;
 
   /// Timeout for uploading a record, so an offline device never blocks the
   /// game-over flow (Firestore writes wait for the server acknowledgement).
@@ -111,6 +113,7 @@ class Training999 extends FlameGame
   double _shrinkTimeLeft = 0;
   ShieldComponent? _shield;
   final ItemBar _itemBar = ItemBar();
+  final HudComponent _hud = HudComponent();
 
   late final RouterComponent router;
   final Set<LogicalKeyboardKey> pressedKeySets = {};
@@ -188,6 +191,9 @@ class Training999 extends FlameGame
     if (!_itemBar.isMounted) {
       add(_itemBar);
     }
+    if (!_hud.isMounted) {
+      add(_hud);
+    }
 
     detectCloseToBullet.position = player.position;
     _titleIndex = 0;
@@ -209,18 +215,18 @@ class Training999 extends FlameGame
 
           if (gameTime > 0 && gameTime % 15 == 0) {
             addBullet(BulletLevel.middle);
-            _announce('高速彈發射!');
+            _announce('高速彈發射!', color: UiColors.gold);
           }
 
           if (gameTime > 0 && gameTime % 25 == 0) {
             addBullet(BulletLevel.hard);
-            _announce('誘導彈發射!');
+            _announce('誘導彈發射!', color: UiColors.pink);
             musicManager.play(Sfx.warning);
           }
 
           if (gameTime > 0 && gameTime % _ringIntervalSeconds == 0) {
             _spawnRing();
-            _announce('包圍彈來襲!');
+            _announce('包圍彈來襲!', color: UiColors.cyan);
             musicManager.play(Sfx.warning);
           }
 
@@ -233,9 +239,12 @@ class Training999 extends FlameGame
 
   /// Shows a short announcement at the top; several announcements in the same
   /// second are stacked instead of overlapping.
-  void _announce(String text) {
-    add(InfoTextComponent(text,
-        Vector2(size.x / 2, _announcementSlot * _announcementLineHeight)));
+  void _announce(String text, {Color color = const Color(0xFFFFFFFF)}) {
+    add(InfoTextComponent(
+        text,
+        Vector2(size.x / 2,
+            _announcementTop + _announcementSlot * _announcementLineHeight),
+        color: color));
     _announcementSlot++;
   }
 
@@ -245,7 +254,7 @@ class Training999 extends FlameGame
       return;
     }
     spawner.period = max(_minEasyPeriod, spawner.period * _densityFactor);
-    _announce('彈幕密度上升!');
+    _announce('彈幕密度上升!', color: const Color(0xFFFFAB40));
   }
 
   /// Spawns a ring of bullets on the spawn circle, all flying towards the
@@ -289,7 +298,10 @@ class Training999 extends FlameGame
   void addBrilliantlyDodgedTheBulletText() {
     brilliantlyDodgedTheBullet++;
     grazePoints++;
-    add(InfoTextComponent('絕妙度過子彈！', size / 2));
+    // Show the praise right above the ship.
+    add(InfoTextComponent(
+        '絕妙度過子彈！', player.position - Vector2(0, player.scaledSize.y + 8),
+        color: UiColors.cyan, fontSize: 14, duration: 0.8));
     musicManager.play(Sfx.graze);
     if (ItemType.values.any((type) => type.cost == grazePoints)) {
       // An item just became affordable.
@@ -320,7 +332,8 @@ class Training999 extends FlameGame
     }
     grazePoints -= type.cost;
     musicManager.play(type.sfx);
-    add(InfoTextComponent(type.announcement, Vector2(size.x / 2, size.y / 3)));
+    add(InfoTextComponent(type.announcement, Vector2(size.x / 2, size.y / 3),
+        color: type.color));
     switch (type) {
       case ItemType.shield:
         player.add(_shield = ShieldComponent(parentSize: player.size));
@@ -414,7 +427,8 @@ class Training999 extends FlameGame
     _titleIndex = index;
     musicManager.play(Sfx.titleUp);
     add(InfoTextComponent(
-        '稱號升級：${playerTitles[index].name}', Vector2(size.x / 2, size.y / 4)));
+        '稱號升級：${playerTitles[index].name}', Vector2(size.x / 2, size.y / 4),
+        color: UiColors.gold, fontSize: 26, duration: 2));
   }
 
   /// Title of the current (or just finished) run.
@@ -463,13 +477,21 @@ class Training999 extends FlameGame
   JoystickComponent _createJoystick(Vector2 position) {
     return JoystickComponent(
         priority: 10,
-        knob: SpriteComponent(
-          size: Vector2(50, 50),
-          sprite: Sprite(images.fromCache('Knob.png')),
+        knob: CircleComponent(
+          radius: 22,
+          paint: Paint()
+            ..shader = RadialGradient(colors: [
+              UiColors.cyan.withValues(alpha: 0.55),
+              UiColors.cyan.withValues(alpha: 0.15),
+            ]).createShader(
+                Rect.fromCircle(center: const Offset(22, 22), radius: 22)),
         ),
-        background: SpriteComponent(
-          size: Vector2(64, 64),
-          sprite: Sprite(images.fromCache('Joystick.png')),
+        background: CircleComponent(
+          radius: 36,
+          paint: Paint()
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2
+            ..color = UiColors.cyan.withValues(alpha: 0.35),
         ),
         position: position);
   }
@@ -515,9 +537,6 @@ class Training999 extends FlameGame
       debugPrint('[Training999] Failed to upload rank: $error');
     }
 
-    if (!children.any((c) => c is ScoreText)) {
-      add(ScoreText());
-    }
     overlays.add('rank');
   }
 
@@ -557,7 +576,7 @@ class Training999 extends FlameGame
         c is TimerComponent ||
         c is SpawnComponent ||
         c is ExplosionComponent ||
-        c is ScoreText);
+        c is HudComponent);
     gameTime = 0;
     _survivedSeconds = 0;
     _easySpawner = null;

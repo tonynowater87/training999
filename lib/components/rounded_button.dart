@@ -1,71 +1,88 @@
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
-import 'package:flame/text.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
+import 'package:training999/art/ui_painter.dart';
+import 'package:training999/art/ui_theme.dart';
 
+/// Neon menu button.
 class RoundedButton extends PositionComponent
     with TapCallbacks, KeyboardHandler {
   RoundedButton({
     required this.text,
     required this.action,
-    required Color color,
-    required Color borderColor,
+    this.accent = UiColors.cyan,
+    this.hint,
     this.shortcutKeys = const {},
     super.position,
     super.anchor = Anchor.center,
-  }) : _textDrawable = TextPaint(
-          style: const TextStyle(
-            fontSize: 20,
-            color: Color(0xFF000000),
-            fontWeight: FontWeight.w800,
-          ),
-        ).toTextPainter(text) {
-    size = Vector2(150, 40);
-    _textOffset = Offset(
-      (size.x - _textDrawable.width) / 2,
-      (size.y - _textDrawable.height) / 2,
-    );
-    _rrect = RRect.fromLTRBR(0, 0, size.x, size.y, Radius.circular(size.y / 2));
-    _bgPaint = Paint()..color = color;
-    _borderPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..color = borderColor;
-  }
+  }) : super(size: Vector2(230, 46));
 
   final String text;
   final void Function() action;
+  final Color accent;
+
+  /// Small text on the right, e.g. a keyboard shortcut.
+  final String? hint;
 
   /// Keys that trigger [action]. Only one button on a page should own a key,
   /// otherwise a single key press triggers several buttons at once.
   final Set<LogicalKeyboardKey> shortcutKeys;
-  final TextPainter _textDrawable;
-  late final Offset _textOffset;
-  late final RRect _rrect;
-  late final Paint _borderPaint;
-  late final Paint _bgPaint;
+
+  late final TextPainter _label = UiPainter.layoutText(text,
+      fontSize: 20,
+      fontWeight: FontWeight.w800,
+      glow: accent,
+      letterSpacing: 4);
+  late final TextPainter? _hint = hint == null
+      ? null
+      : UiPainter.layoutText(hint!,
+          fontSize: 10, color: UiColors.textFaint, letterSpacing: 1);
+
+  bool _pressed = false;
 
   @override
   void render(Canvas canvas) {
-    canvas.drawRRect(_rrect, _bgPaint);
-    canvas.drawRRect(_rrect, _borderPaint);
-    _textDrawable.paint(canvas, _textOffset);
+    UiPainter.paintPanel(
+      canvas,
+      size.toRect(),
+      accent: accent,
+      radius: size.y / 2,
+      fillAlpha: _pressed ? 0.95 : 0.75,
+      borderAlpha: _pressed ? 1 : 0.8,
+      glow: _pressed ? 1.6 : 1,
+    );
+    final hint = _hint;
+    // With a hint on the right, center the label in the remaining space.
+    final labelCenterX =
+        hint == null ? size.x / 2 : (size.x - hint.width - 16) / 2 + 8;
+    UiPainter.drawText(canvas, _label, Offset(labelCenterX, size.y / 2),
+        alignX: 0.5, alignY: 0.5);
+    if (hint != null) {
+      UiPainter.drawText(canvas, hint, Offset(size.x - 16, size.y / 2),
+          alignX: 1, alignY: 0.5);
+    }
   }
 
   @override
   void onTapDown(TapDownEvent event) {
+    _pressed = true;
     scale = Vector2.all(1.05);
   }
 
   @override
   void onTapUp(TapUpEvent event) {
-    scale = Vector2.all(1.0);
+    _release();
     action();
   }
 
   @override
   void onTapCancel(TapCancelEvent event) {
+    _release();
+  }
+
+  void _release() {
+    _pressed = false;
     scale = Vector2.all(1.0);
   }
 
