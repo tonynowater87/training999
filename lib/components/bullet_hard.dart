@@ -32,11 +32,12 @@ class BulletHard extends SpriteComponent
     if (game.isGameOver) {
       return;
     }
+    final scaledDt = dt * game.bulletTimeScale;
     if (_homingTimeLeft > 0) {
-      _homingTimeLeft -= dt;
-      _steerTowards(game.player.position, dt);
+      _homingTimeLeft -= scaledDt;
+      _steerTowards(game.player.position, scaledDt);
     }
-    moveBullet(dt);
+    moveBullet(scaledDt);
   }
 
   void _steerTowards(Vector2 target, double dt) {

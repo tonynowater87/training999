@@ -37,8 +37,7 @@ flutter:
     - assets/images/
     - assets/icon/
     - assets/audio/music/bgm.mp3
-    - assets/audio/effect/explosion.mp3
-    - assets/audio/effect/menu_select.mp3
+    - assets/audio/effect/
 
 flutter_launcher_icons:
   android: true

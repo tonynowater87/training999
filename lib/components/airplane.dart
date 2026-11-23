@@ -47,16 +47,24 @@ class Airplane extends SpriteAnimationComponent
     ));
   }
 
+  /// Uses [onCollision] (every frame while overlapping) instead of
+  /// onCollisionStart, so a bullet still overlapping when invincibility ends
+  /// is not ignored.
   @override
-  void onCollisionStart(
+  void onCollision(
     Set<Vector2> intersectionPoints,
     PositionComponent other,
   ) {
-    super.onCollisionStart(intersectionPoints, other);
-    if (other is Bullet && !game.isGameOver) {
-      explode();
-      game.gameover();
+    super.onCollision(intersectionPoints, other);
+    if (other is! Bullet || game.isGameOver || game.isInvincible) {
+      return;
     }
+    if (game.consumeShield()) {
+      other.removeFromParent();
+      return;
+    }
+    explode();
+    game.gameover();
   }
 
   @override
@@ -64,11 +72,17 @@ class Airplane extends SpriteAnimationComponent
     if (game.isGameOver) {
       return;
     }
-    // Keep the airplane inside the screen.
+    // Keep the airplane inside the screen (size is affected by shrink).
+    final halfWidth = scaledSize.x / 2;
+    final halfHeight = scaledSize.y / 2;
     position.setValues(
-      position.x.clamp(size.x / 2, game.size.x - size.x / 2).toDouble(),
-      position.y.clamp(size.y / 2, game.size.y - size.y / 2).toDouble(),
+      position.x.clamp(halfWidth, game.size.x - halfWidth).toDouble(),
+      position.y.clamp(halfHeight, game.size.y - halfHeight).toDouble(),
     );
+    // Blink while invincible.
+    opacity = game.isInvincible && (game.invincibleTimeLeft * 10).floor().isEven
+        ? 0.3
+        : 1.0;
     super.update(dt);
   }
 

@@ -27,6 +27,6 @@ class BulletMid extends SpriteComponent
     if (game.isGameOver) {
       return;
     }
-    moveBullet(dt);
+    moveBullet(dt * game.bulletTimeScale);
   }
 }

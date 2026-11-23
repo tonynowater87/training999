@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flame/components.dart';
+import 'package:flame/effects.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flame_riverpod/flame_riverpod.dart';
@@ -16,7 +17,9 @@ import 'package:training999/components/bullet_hard.dart';
 import 'package:training999/components/bullet_mid.dart';
 import 'package:training999/components/explosion.dart';
 import 'package:training999/components/info_text.dart';
+import 'package:training999/components/item_bar.dart';
 import 'package:training999/components/score_text.dart';
+import 'package:training999/components/shield.dart';
 import 'package:training999/components/star_background_creator.dart';
 import 'package:training999/page/menu_page.dart';
 import 'package:training999/page/splash_page.dart';
@@ -26,6 +29,7 @@ import 'package:training999/provider/rank/model/rank.dart';
 import 'package:training999/provider/rank/my_latest_rank_provider.dart';
 import 'package:training999/provider/uuid/get_uuid.dart';
 import 'package:training999/util/bullet_level.dart';
+import 'package:training999/util/item_type.dart';
 import 'package:training999/util/music_manager.dart';
 import 'package:training999/util/player_title.dart';
 
@@ -100,6 +104,14 @@ class Training999 extends FlameGame
   int _titleIndex = 0;
   int _announcementSlot = 0;
 
+  /// Graze points available to buy items (one per brilliant dodge).
+  int grazePoints = 0;
+  double invincibleTimeLeft = 0;
+  double _slowTimeLeft = 0;
+  double _shrinkTimeLeft = 0;
+  ShieldComponent? _shield;
+  final ItemBar _itemBar = ItemBar();
+
   late final RouterComponent router;
   final Set<LogicalKeyboardKey> pressedKeySets = {};
   String myName = '';
@@ -110,6 +122,11 @@ class Training999 extends FlameGame
 
   /// Survive time of the current run in milliseconds.
   int get surviveTime => (_survivedSeconds * 1000).round();
+
+  bool get isInvincible => invincibleTimeLeft > 0;
+
+  /// Multiplier applied to bullet movement (slowed by [ItemType.slow]).
+  double get bulletTimeScale => _slowTimeLeft > 0 ? slowBulletTimeScale : 1.0;
 
   /// Distance from the screen center to a corner.
   double get gameSizeOfRadius => size.length / 2;
@@ -168,6 +185,9 @@ class Training999 extends FlameGame
     if (!joystickLeft.isMounted || !joystickRight.isMounted) {
       addJoystick();
     }
+    if (!_itemBar.isMounted) {
+      add(_itemBar);
+    }
 
     detectCloseToBullet.position = player.position;
     _titleIndex = 0;
@@ -195,11 +215,13 @@ class Training999 extends FlameGame
           if (gameTime > 0 && gameTime % 25 == 0) {
             addBullet(BulletLevel.hard);
             _announce('誘導彈發射!');
+            musicManager.play(Sfx.warning);
           }
 
           if (gameTime > 0 && gameTime % _ringIntervalSeconds == 0) {
             _spawnRing();
             _announce('包圍彈來襲!');
+            musicManager.play(Sfx.warning);
           }
 
           if (gameTime > 0 && gameTime % _densityStepSeconds == 0) {
@@ -266,7 +288,104 @@ class Training999 extends FlameGame
 
   void addBrilliantlyDodgedTheBulletText() {
     brilliantlyDodgedTheBullet++;
+    grazePoints++;
     add(InfoTextComponent('絕妙度過子彈！', size / 2));
+    musicManager.play(Sfx.graze);
+    if (ItemType.values.any((type) => type.cost == grazePoints)) {
+      // An item just became affordable.
+      musicManager.play(Sfx.itemReady);
+    }
+  }
+
+  bool canUseItem(ItemType type) =>
+      !isGameOver && grazePoints >= type.cost && itemActiveRatio(type) == 0;
+
+  /// 1.0 right after an item was used, falling to 0 when its effect ends.
+  double itemActiveRatio(ItemType type) {
+    switch (type) {
+      case ItemType.shield:
+        return _shield == null ? 0 : 1;
+      case ItemType.bomb:
+        return 0;
+      case ItemType.slow:
+        return _slowTimeLeft / type.duration;
+      case ItemType.shrink:
+        return _shrinkTimeLeft / type.duration;
+    }
+  }
+
+  void useItem(ItemType type) {
+    if (!canUseItem(type)) {
+      return;
+    }
+    grazePoints -= type.cost;
+    musicManager.play(type.sfx);
+    add(InfoTextComponent(type.announcement, Vector2(size.x / 2, size.y / 3)));
+    switch (type) {
+      case ItemType.shield:
+        player.add(_shield = ShieldComponent(parentSize: player.size));
+      case ItemType.bomb:
+        removeWhere((c) => c is Bullet);
+        _flashScreen();
+      case ItemType.slow:
+        _slowTimeLeft = type.duration;
+      case ItemType.shrink:
+        _shrinkTimeLeft = type.duration;
+        player.scale = Vector2.all(shrinkPlayerScale);
+    }
+  }
+
+  /// Absorbs a hit with the shield. Returns false when there is no shield.
+  bool consumeShield() {
+    final shield = _shield;
+    if (shield == null) {
+      return false;
+    }
+    shield.removeFromParent();
+    _shield = null;
+    invincibleTimeLeft = shieldInvincibleDuration;
+    musicManager.play(Sfx.shieldBreak);
+    return true;
+  }
+
+  void _flashScreen() {
+    final flash = RectangleComponent(
+      size: size.clone(),
+      priority: 150,
+      paint: Paint()..color = const Color(0x99FFFFFF),
+    );
+    flash.add(OpacityEffect.fadeOut(
+      EffectController(duration: 0.4),
+      onComplete: flash.removeFromParent,
+    ));
+    add(flash);
+  }
+
+  void _updateItemEffects(double dt) {
+    if (invincibleTimeLeft > 0) {
+      invincibleTimeLeft = max(0, invincibleTimeLeft - dt);
+    }
+    if (_slowTimeLeft > 0) {
+      _slowTimeLeft = max(0, _slowTimeLeft - dt);
+    }
+    if (_shrinkTimeLeft > 0) {
+      _shrinkTimeLeft = max(0, _shrinkTimeLeft - dt);
+      if (_shrinkTimeLeft == 0) {
+        player.scale = Vector2.all(1);
+      }
+    }
+  }
+
+  void _clearItemEffects() {
+    grazePoints = 0;
+    invincibleTimeLeft = 0;
+    _slowTimeLeft = 0;
+    _shrinkTimeLeft = 0;
+    _shield?.removeFromParent();
+    _shield = null;
+    player
+      ..scale = Vector2.all(1)
+      ..opacity = 1;
   }
 
   @override
@@ -281,6 +400,7 @@ class Training999 extends FlameGame
       // slow devices cannot inflate the score.
       _survivedSeconds += dt;
       _movePlayer(dt);
+      _updateItemEffects(dt);
       _checkTitleUpgrade();
     }
     super.update(dt);
@@ -292,6 +412,7 @@ class Training999 extends FlameGame
       return;
     }
     _titleIndex = index;
+    musicManager.play(Sfx.titleUp);
     add(InfoTextComponent(
         '稱號升級：${playerTitles[index].name}', Vector2(size.x / 2, size.y / 4)));
   }
@@ -313,6 +434,14 @@ class Training999 extends FlameGame
 
     if (isGameOver) {
       return KeyEventResult.ignored;
+    }
+    if (event is KeyDownEvent) {
+      for (final type in ItemType.values) {
+        if (type.shortcutKey == event.logicalKey) {
+          useItem(type);
+          return KeyEventResult.handled;
+        }
+      }
     }
     return _isMovementKey(event.logicalKey)
         ? KeyEventResult.handled
@@ -360,7 +489,10 @@ class Training999 extends FlameGame
     musicManager.playExplosion();
     // Stop spawning before the (possibly slow) upload starts.
     removeWhere((c) =>
-        c is JoystickComponent || c is TimerComponent || c is SpawnComponent);
+        c is JoystickComponent ||
+        c is TimerComponent ||
+        c is SpawnComponent ||
+        c is ItemBar);
 
     final myNameState = ref.read(myNameProvider);
     final now = Timestamp.now();
@@ -432,6 +564,7 @@ class Training999 extends FlameGame
     _titleIndex = 0;
     brilliantlyDodgedTheBullet = 0;
     pressedKeySets.clear();
+    _clearItemEffects();
     player.position = size / 2;
   }
 

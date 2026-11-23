@@ -49,6 +49,6 @@ class BulletEasy extends CircleComponent
     if (game.isGameOver) {
       return;
     }
-    moveBullet(dt);
+    moveBullet(dt * game.bulletTimeScale);
   }
 }
