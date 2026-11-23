@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+import 'package:training999/art/bullet_painter.dart';
 import 'package:training999/components/bullet.dart';
 import 'package:training999/training_999.dart';
 import 'package:training999/util/bullet_level.dart';
@@ -39,8 +40,13 @@ class BulletEasy extends CircleComponent
   Future<void> onLoad() async {
     await super.onLoad();
     add(CircleHitbox());
-    paint = Paint()..color = color ?? level.getColor();
     aimAt(target ?? game.size / 2, angleOffset: angleOffset);
+  }
+
+  @override
+  void render(Canvas canvas) {
+    BulletPainter.paintOrb(
+        canvas, Offset(radius, radius), radius, color ?? level.getColor());
   }
 
   @override
