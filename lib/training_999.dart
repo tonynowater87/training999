@@ -27,6 +27,7 @@ import 'package:training999/provider/rank/my_latest_rank_provider.dart';
 import 'package:training999/provider/uuid/get_uuid.dart';
 import 'package:training999/util/bullet_level.dart';
 import 'package:training999/util/music_manager.dart';
+import 'package:training999/util/player_title.dart';
 
 import 'components/detect_close_to_bullet.dart';
 
@@ -50,6 +51,21 @@ class Training999 extends FlameGame
 
   /// Extra distance a bullet may travel past the spawn circle before removal.
   static const double _despawnMargin = 50;
+
+  /// Every [_densityStepSeconds] the easy bullet period is multiplied by
+  /// [_densityFactor], down to [_minEasyPeriod].
+  static const int _densityStepSeconds = 10;
+  static const double _densityFactor = 0.9;
+  static const double _minEasyPeriod = 0.04;
+
+  /// A ring of bullets closes in on the player every [_ringIntervalSeconds].
+  static const int _ringIntervalSeconds = 20;
+  static const int _ringBaseBulletCount = 16;
+  static const int _ringMaxBulletCount = 32;
+  static const Color _ringBulletColor = Color(0xFF66E0FF);
+
+  /// Vertical distance between announcements shown in the same second.
+  static const double _announcementLineHeight = 30;
 
   /// Timeout for uploading a record, so an offline device never blocks the
   /// game-over flow (Firestore writes wait for the server acknowledgement).
@@ -80,6 +96,9 @@ class Training999 extends FlameGame
   int gameTime = 0;
   int brilliantlyDodgedTheBullet = 0;
   double _survivedSeconds = 0;
+  SpawnComponent? _easySpawner;
+  int _titleIndex = 0;
+  int _announcementSlot = 0;
 
   late final RouterComponent router;
   final Set<LogicalKeyboardKey> pressedKeySets = {};
@@ -151,6 +170,7 @@ class Training999 extends FlameGame
     }
 
     detectCloseToBullet.position = player.position;
+    _titleIndex = 0;
     add(TimerComponent(
         period: 1,
         repeat: true,
@@ -160,27 +180,69 @@ class Training999 extends FlameGame
           if (isGameOver) {
             return;
           }
+          _announcementSlot = 0;
 
           if (gameTime == 0) {
-            addBullet(BulletLevel.easy);
-            add(InfoTextComponent('Game Start!', Vector2(size.x / 2, 0)));
+            _easySpawner = addBullet(BulletLevel.easy);
+            _announce('Game Start!');
           }
 
           if (gameTime > 0 && gameTime % 15 == 0) {
             addBullet(BulletLevel.middle);
-            add(InfoTextComponent('高速彈發射!', Vector2(size.x / 2, 0)));
+            _announce('高速彈發射!');
           }
 
           if (gameTime > 0 && gameTime % 25 == 0) {
             addBullet(BulletLevel.hard);
-            add(InfoTextComponent('誘導彈發射!', Vector2(size.x / 2, 0)));
+            _announce('誘導彈發射!');
+          }
+
+          if (gameTime > 0 && gameTime % _ringIntervalSeconds == 0) {
+            _spawnRing();
+            _announce('包圍彈來襲!');
+          }
+
+          if (gameTime > 0 && gameTime % _densityStepSeconds == 0) {
+            _increaseEasyDensity();
           }
           gameTime++;
         }));
   }
 
-  void addBullet(BulletLevel bulletLevel) {
-    add(SpawnComponent(
+  /// Shows a short announcement at the top; several announcements in the same
+  /// second are stacked instead of overlapping.
+  void _announce(String text) {
+    add(InfoTextComponent(text,
+        Vector2(size.x / 2, _announcementSlot * _announcementLineHeight)));
+    _announcementSlot++;
+  }
+
+  void _increaseEasyDensity() {
+    final spawner = _easySpawner;
+    if (spawner == null || spawner.period <= _minEasyPeriod) {
+      return;
+    }
+    spawner.period = max(_minEasyPeriod, spawner.period * _densityFactor);
+    _announce('彈幕密度上升!');
+  }
+
+  /// Spawns a ring of bullets on the spawn circle, all flying towards the
+  /// player's current position. Stay still and you are surrounded.
+  void _spawnRing() {
+    final count = min(_ringMaxBulletCount,
+        _ringBaseBulletCount + gameTime ~/ _ringIntervalSeconds * 2);
+    final target = player.position.clone();
+    final rotation = _rng.nextDouble() * 2 * pi;
+    for (var i = 0; i < count; i++) {
+      final radians = rotation + 2 * pi * i / count;
+      final position =
+          Vector2(cos(radians), sin(radians)) * _bulletSpawnRadius + size / 2;
+      add(BulletEasy(position, target: target, color: _ringBulletColor));
+    }
+  }
+
+  SpawnComponent addBullet(BulletLevel bulletLevel) {
+    final spawner = SpawnComponent(
         selfPositioning: true,
         factory: (int amount) {
           final radians = _rng.nextDouble() * 2 * pi;
@@ -197,7 +259,9 @@ class Training999 extends FlameGame
               return BulletHard(position);
           }
         },
-        period: bulletLevel.getPeriod()));
+        period: bulletLevel.getPeriod());
+    add(spawner);
+    return spawner;
   }
 
   void addBrilliantlyDodgedTheBulletText() {
@@ -217,9 +281,24 @@ class Training999 extends FlameGame
       // slow devices cannot inflate the score.
       _survivedSeconds += dt;
       _movePlayer(dt);
+      _checkTitleUpgrade();
     }
     super.update(dt);
   }
+
+  void _checkTitleUpgrade() {
+    final index = titleIndexFor(surviveTime);
+    if (index <= _titleIndex) {
+      return;
+    }
+    _titleIndex = index;
+    add(InfoTextComponent(
+        '稱號升級：${playerTitles[index].name}', Vector2(size.x / 2, size.y / 4)));
+  }
+
+  /// Title of the current (or just finished) run.
+  String get currentFullTitle =>
+      fullTitleFor(surviveTime, brilliantlyDodgedTheBullet);
 
   @override
   KeyEventResult onKeyEvent(
@@ -349,6 +428,8 @@ class Training999 extends FlameGame
         c is ScoreText);
     gameTime = 0;
     _survivedSeconds = 0;
+    _easySpawner = null;
+    _titleIndex = 0;
     brilliantlyDodgedTheBullet = 0;
     pressedKeySets.clear();
     player.position = size / 2;

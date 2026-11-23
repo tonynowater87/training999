@@ -9,15 +9,25 @@ import 'package:training999/util/bullet_level.dart';
 
 class BulletEasy extends CircleComponent
     with HasGameReference<Training999>, CollisionCallbacks, Bullet {
-  BulletEasy(Vector2 position, {required this.angleOffset})
-      : super(
+  BulletEasy(
+    Vector2 position, {
+    this.angleOffset = 0,
+    this.target,
+    this.color,
+  }) : super(
           position: position,
           radius: BulletLevel.easy.getRadius(),
           anchor: Anchor.center,
         );
 
-  /// Random spread around the direction to the screen center.
+  /// Random spread around the direction to [target].
   final double angleOffset;
+
+  /// Point to fly towards; defaults to the screen center.
+  final Vector2? target;
+
+  /// Overrides the level color, e.g. for ring bullets.
+  final Color? color;
 
   @override
   BulletLevel get level => BulletLevel.easy;
@@ -29,8 +39,8 @@ class BulletEasy extends CircleComponent
   Future<void> onLoad() async {
     await super.onLoad();
     add(CircleHitbox());
-    paint = Paint()..color = level.getColor();
-    aimAt(game.size / 2, angleOffset: angleOffset);
+    paint = Paint()..color = color ?? level.getColor();
+    aimAt(target ?? game.size / 2, angleOffset: angleOffset);
   }
 
   @override

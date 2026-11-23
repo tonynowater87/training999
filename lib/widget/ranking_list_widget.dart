@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:training999/provider/rank/all_rank_provider.dart';
 import 'package:training999/provider/rank/model/rank.dart';
 import 'package:training999/provider/rank/my_latest_rank_provider.dart';
+import 'package:training999/util/player_title.dart';
 import 'package:training999/util/time_utils.dart';
 
 class RankingListWidget extends ConsumerStatefulWidget {
@@ -18,6 +19,9 @@ class _RankingListWidgetState extends ConsumerState<RankingListWidget> {
   static const double _itemExtent = 56;
   static const TextStyle _textStyle =
       TextStyle(fontSize: 24, color: Colors.white);
+
+  static const TextStyle _latestTitleStyle = TextStyle(
+      fontSize: 24, color: Colors.amberAccent, fontWeight: FontWeight.bold);
 
   final ScrollController _scrollController = ScrollController();
   int? _scrolledToIndex;
@@ -51,7 +55,20 @@ class _RankingListWidgetState extends ConsumerState<RankingListWidget> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('排行榜', style: _textStyle),
+                Row(
+                  children: [
+                    const Text('排行榜', style: _textStyle),
+                    const SizedBox(width: 24),
+                    if (myLatestRank != null)
+                      Expanded(
+                        child: Text(
+                          '最近稱號：「${_titleOf(myLatestRank)}」',
+                          style: _latestTitleStyle,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                  ],
+                ),
                 Expanded(
                   child: CustomScrollView(
                     controller: _scrollController,
@@ -122,6 +139,10 @@ class _RankTile extends StatelessWidget {
 
   static const TextStyle _textStyle =
       TextStyle(fontSize: 24, color: Colors.white);
+  static const TextStyle _nameStyle =
+      TextStyle(fontSize: 20, color: Colors.white, height: 1.1);
+  static const TextStyle _titleStyle =
+      TextStyle(fontSize: 14, color: Colors.amberAccent, height: 1.1);
 
   @override
   Widget build(BuildContext context) {
@@ -137,10 +158,23 @@ class _RankTile extends StatelessWidget {
           Text(title, style: _textStyle),
           const SizedBox(width: 16),
           Expanded(
-            child: Text(
-              rank.name,
-              style: _textStyle,
-              overflow: TextOverflow.ellipsis,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  rank.name,
+                  style: _nameStyle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  _titleOf(rank),
+                  style: _titleStyle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ),
           Text(
@@ -155,3 +189,6 @@ class _RankTile extends StatelessWidget {
     );
   }
 }
+
+String _titleOf(Rank rank) => fullTitleFor(
+    rank.survivedTimeInMilliseconds, rank.brilliantlyDodgedTheBullets);
