@@ -4,7 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame/sprite.dart';
 import 'package:training999/components/star_component.dart';
 
-class StarBackGroundCreator extends Component with HasGameRef {
+class StarBackGroundCreator extends Component with HasGameReference {
   final gapSize = 12;
 
   late final SpriteSheet spriteSheet;

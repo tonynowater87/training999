@@ -6,12 +6,14 @@ part of 'my_name_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$myNameHash() => r'13693709287bbb03c0323462abaffcd9a20fd5d7';
+String _$myNameHash() => r'c3f1f8cc1e3ea7c35844250c386edc86d830b8af';
 
-/// See also [myName].
-@ProviderFor(myName)
-final myNameProvider = FutureProvider<UserName>.internal(
-  myName,
+/// The name registered for this device. An empty name means "not registered".
+///
+/// Copied from [MyName].
+@ProviderFor(MyName)
+final myNameProvider = AsyncNotifierProvider<MyName, UserName>.internal(
+  MyName.new,
   name: r'myNameProvider',
   debugGetCreateSourceHash:
       const bool.fromEnvironment('dart.vm.product') ? null : _$myNameHash,
@@ -19,6 +21,6 @@ final myNameProvider = FutureProvider<UserName>.internal(
   allTransitiveDependencies: null,
 );
 
-typedef MyNameRef = FutureProviderRef<UserName>;
+typedef _$MyName = AsyncNotifier<UserName>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

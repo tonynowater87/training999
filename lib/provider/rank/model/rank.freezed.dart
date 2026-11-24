@@ -17,7 +17,9 @@ final _privateConstructorUsedError = UnsupportedError(
 /// @nodoc
 mixin _$Rank {
   int get id => throw _privateConstructorUsedError;
-  String get name => throw _privateConstructorUsedError;
+  String get name =>
+      throw _privateConstructorUsedError; // Device id of the player. Null for records created before it existed.
+  String? get uuid => throw _privateConstructorUsedError;
   int get survivedTimeInMilliseconds => throw _privateConstructorUsedError;
   int get brilliantlyDodgedTheBullets => throw _privateConstructorUsedError;
   Timestamp get createdAt => throw _privateConstructorUsedError;
@@ -35,6 +37,7 @@ abstract class $RankCopyWith<$Res> {
   $Res call(
       {int id,
       String name,
+      String? uuid,
       int survivedTimeInMilliseconds,
       int brilliantlyDodgedTheBullets,
       Timestamp createdAt,
@@ -56,6 +59,7 @@ class _$RankCopyWithImpl<$Res, $Val extends Rank>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? uuid = freezed,
     Object? survivedTimeInMilliseconds = null,
     Object? brilliantlyDodgedTheBullets = null,
     Object? createdAt = null,
@@ -70,6 +74,10 @@ class _$RankCopyWithImpl<$Res, $Val extends Rank>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      uuid: freezed == uuid
+          ? _value.uuid
+          : uuid // ignore: cast_nullable_to_non_nullable
+              as String?,
       survivedTimeInMilliseconds: null == survivedTimeInMilliseconds
           ? _value.survivedTimeInMilliseconds
           : survivedTimeInMilliseconds // ignore: cast_nullable_to_non_nullable
@@ -100,6 +108,7 @@ abstract class _$$RankImplCopyWith<$Res> implements $RankCopyWith<$Res> {
   $Res call(
       {int id,
       String name,
+      String? uuid,
       int survivedTimeInMilliseconds,
       int brilliantlyDodgedTheBullets,
       Timestamp createdAt,
@@ -118,6 +127,7 @@ class __$$RankImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
+    Object? uuid = freezed,
     Object? survivedTimeInMilliseconds = null,
     Object? brilliantlyDodgedTheBullets = null,
     Object? createdAt = null,
@@ -132,6 +142,10 @@ class __$$RankImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
+      uuid: freezed == uuid
+          ? _value.uuid
+          : uuid // ignore: cast_nullable_to_non_nullable
+              as String?,
       survivedTimeInMilliseconds: null == survivedTimeInMilliseconds
           ? _value.survivedTimeInMilliseconds
           : survivedTimeInMilliseconds // ignore: cast_nullable_to_non_nullable
@@ -158,6 +172,7 @@ class _$RankImpl implements _Rank {
   const _$RankImpl(
       {required this.id,
       required this.name,
+      this.uuid,
       required this.survivedTimeInMilliseconds,
       required this.brilliantlyDodgedTheBullets,
       required this.createdAt,
@@ -167,6 +182,9 @@ class _$RankImpl implements _Rank {
   final int id;
   @override
   final String name;
+// Device id of the player. Null for records created before it existed.
+  @override
+  final String? uuid;
   @override
   final int survivedTimeInMilliseconds;
   @override
@@ -178,7 +196,7 @@ class _$RankImpl implements _Rank {
 
   @override
   String toString() {
-    return 'Rank(id: $id, name: $name, survivedTimeInMilliseconds: $survivedTimeInMilliseconds, brilliantlyDodgedTheBullets: $brilliantlyDodgedTheBullets, createdAt: $createdAt, platform: $platform)';
+    return 'Rank(id: $id, name: $name, uuid: $uuid, survivedTimeInMilliseconds: $survivedTimeInMilliseconds, brilliantlyDodgedTheBullets: $brilliantlyDodgedTheBullets, createdAt: $createdAt, platform: $platform)';
   }
 
   @override
@@ -188,6 +206,7 @@ class _$RankImpl implements _Rank {
             other is _$RankImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.uuid, uuid) || other.uuid == uuid) &&
             (identical(other.survivedTimeInMilliseconds,
                     survivedTimeInMilliseconds) ||
                 other.survivedTimeInMilliseconds ==
@@ -207,6 +226,7 @@ class _$RankImpl implements _Rank {
       runtimeType,
       id,
       name,
+      uuid,
       survivedTimeInMilliseconds,
       brilliantlyDodgedTheBullets,
       createdAt,
@@ -223,6 +243,7 @@ abstract class _Rank implements Rank {
   const factory _Rank(
       {required final int id,
       required final String name,
+      final String? uuid,
       required final int survivedTimeInMilliseconds,
       required final int brilliantlyDodgedTheBullets,
       required final Timestamp createdAt,
@@ -232,6 +253,8 @@ abstract class _Rank implements Rank {
   int get id;
   @override
   String get name;
+  @override // Device id of the player. Null for records created before it existed.
+  String? get uuid;
   @override
   int get survivedTimeInMilliseconds;
   @override

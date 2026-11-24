@@ -6,9 +6,11 @@ part of 'all_rank_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$allRankHash() => r'7e847b8d498ea90ffb72316fd4e5b5d63bb0876a';
+String _$allRankHash() => r'1bc1ff2c252ce315ab92275c9d315ae807b121a7';
 
-/// See also [AllRank].
+/// The top [rankLimit] records, best first.
+///
+/// Copied from [AllRank].
 @ProviderFor(AllRank)
 final allRankProvider = AsyncNotifierProvider<AllRank, List<Rank>>.internal(
   AllRank.new,

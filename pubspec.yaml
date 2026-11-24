@@ -8,19 +8,14 @@ environment:
 
 dependencies:
   flame: 1.29.0
-  flame_tiled: 1.20.2
   flutter:
     sdk: flutter
-  flutter_launcher_icons: 0.14.1
   flame_riverpod: 5.4.0
   flutter_riverpod: 2.5.1
   riverpod_annotation: 2.3.4
-  freezed: 2.5.2
   freezed_annotation: 2.4.4
   firebase_core: ^3.9.0
   cloud_firestore: ^5.6.0
-  firebase_crashlytics: ^4.2.0
-  firebase_analytics: ^11.3.6
   hooks_riverpod: ^2.5.2
   flutter_hooks: ^0.20.5
   flutter_secure_storage: ^9.2.4
@@ -30,9 +25,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner:
+  build_runner: ^2.4.13
   flutter_lints: 3.0.0
   riverpod_generator: 2.3.11
+  freezed: 2.5.2
+  flutter_launcher_icons: 0.14.1
 
 flutter:
   uses-material-design: true
@@ -40,8 +37,7 @@ flutter:
     - assets/images/
     - assets/icon/
     - assets/audio/music/bgm.mp3
-    - assets/audio/effect/explosion.mp3
-    - assets/audio/effect/menu_select.mp3
+    - assets/audio/effect/
 
 flutter_launcher_icons:
   android: true

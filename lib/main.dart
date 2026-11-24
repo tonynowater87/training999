@@ -1,7 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flame/flame.dart';
 import 'package:flame_riverpod/flame_riverpod.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:training999/firebase_options.dart';
@@ -18,17 +17,17 @@ Future<void> main() async {
   await Flame.device.fullScreen();
   await Flame.device.setLandscape();
 
-  var game = Training999();
+  final game = Training999();
   runApp(ProviderScope(
     observers: [MyProviderObserver()],
     child: MaterialApp(
       home: Scaffold(
-        resizeToAvoidBottomInset: false, // 避免顯示鍵盤變更遊戲畫布大小(造成星星背景也被鍵盤推上去)
+        // Keep the keyboard from resizing the game canvas (stars would move up).
+        resizeToAvoidBottomInset: false,
         body: RiverpodAwareGameWidget<Training999>(
           overlayBuilderMap: {
             'enter_name': (context, game) => const EnterNameWidget(),
             'rank': (context, game) {
-              game.addBulletCountText();
               return RankingListWidget(
                 voidCallback: () {
                   game.reset();
@@ -38,7 +37,7 @@ Future<void> main() async {
               );
             }
           },
-          game: kDebugMode ? Training999() : game,
+          game: game,
           key: GlobalKey(),
         ),
       ),

@@ -1,0 +1,55 @@
+rules_version = '2';
+
+// Deploy with: firebase deploy --only firestore:rules
+// (or paste into Firebase console > Firestore > Rules).
+//
+// Note: without Firebase Auth / App Check, these rules only validate the
+// shape and range of the data. They cannot prove a score was really played.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /ranks/{rankId} {
+      allow read: if true;
+      allow create: if isValidRank(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    match /names/{nameId} {
+      allow read: if true;
+      allow create: if isValidName(request.resource.data);
+      allow update, delete: if false;
+    }
+
+    function isValidName(data) {
+      return data.keys().hasOnly(['uuid', 'name'])
+        && data.keys().hasAll(['uuid', 'name'])
+        && data.uuid is string && data.uuid.size() == 36
+        && data.name is string
+        && data.name.size() >= 1 && data.name.size() <= 20;
+    }
+
+    function isValidRank(data) {
+      return data.keys().hasOnly(['id', 'name', 'uuid',
+          'survivedTimeInMilliseconds', 'brilliantlyDodgedTheBullets',
+          'createdAt', 'platform'])
+        && data.keys().hasAll(['id', 'name',
+          'survivedTimeInMilliseconds', 'brilliantlyDodgedTheBullets',
+          'createdAt', 'platform'])
+        && data.id is int
+        && data.name is string
+        && data.name.size() >= 1 && data.name.size() <= 20
+        && (!('uuid' in data) || (data.uuid is string && data.uuid.size() == 36))
+        && data.survivedTimeInMilliseconds is int
+        && data.survivedTimeInMilliseconds >= 0
+        && data.survivedTimeInMilliseconds <= 3600000
+        && data.brilliantlyDodgedTheBullets is int
+        && data.brilliantlyDodgedTheBullets >= 0
+        && data.brilliantlyDodgedTheBullets <= 100000
+        && data.createdAt is timestamp
+        // Client clock must be roughly correct (within 10 minutes).
+        && data.createdAt > request.time - duration.value(10, 'm')
+        && data.createdAt < request.time + duration.value(10, 'm')
+        && data.platform in ['Android', 'iOS', 'Web', 'macOS', 'Windows', 'Linux', 'Fuchsia'];
+    }
+  }
+}

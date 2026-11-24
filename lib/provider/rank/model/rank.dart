@@ -8,6 +8,8 @@ class Rank with _$Rank {
   const factory Rank({
     required int id,
     required String name,
+    // Device id of the player. Null for records created before it existed.
+    String? uuid,
     required int survivedTimeInMilliseconds,
     required int brilliantlyDodgedTheBullets,
     required Timestamp createdAt,
@@ -20,6 +22,7 @@ class Rank with _$Rank {
     return Rank(
       id: data?['id'],
       name: data?['name'],
+      uuid: data?['uuid'],
       survivedTimeInMilliseconds: data?['survivedTimeInMilliseconds'],
       brilliantlyDodgedTheBullets: data?['brilliantlyDodgedTheBullets'],
       createdAt: data?['createdAt'],
@@ -33,6 +36,7 @@ extension RankX on Rank {
     return {
       "id": id,
       "name": name,
+      if (uuid != null) "uuid": uuid,
       "survivedTimeInMilliseconds": survivedTimeInMilliseconds,
       "brilliantlyDodgedTheBullets": brilliantlyDodgedTheBullets,
       "createdAt": createdAt,

@@ -1,5 +1,3 @@
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -14,7 +12,6 @@ FlutterSecureStorage getSecureStorage(Ref ref) {
 
 @Riverpod(keepAlive: true)
 Future<String> getUuid(Ref ref) async {
-
   FlutterSecureStorage secureStorage = ref.read(getSecureStorageProvider);
 
   // 嘗試從 Secure Storage 中讀取唯一碼
